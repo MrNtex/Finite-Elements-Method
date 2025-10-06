@@ -4,14 +4,12 @@ from typing import List, Dict
 
 @dataclass
 class Node:
-    id: int
     x: float
     y: float
 
 @dataclass
 class Element:
-    id: int
-    nodes: List[int]
+    node_ids: List[int]
 
 @dataclass
 class GlobalData:
@@ -60,19 +58,20 @@ def parse_simulation_file(path: str):
                 global_data[key] = float(value)
             continue
 
-        NODE_BUFFER_SIZE = 3
-        ELEMENT_BUFFER_SIZE = 5
+        NODE_BUFFER_SIZE = 2
+        ELEMENT_BUFFER_SIZE = 4
         if section == "nodes":
             parts = [p.strip() for p in line.split(",") if p.strip()]
+            parts = parts[1:]  # Skip node ID
             if len(parts) == NODE_BUFFER_SIZE:
-                node_id, x, y = parts
-                nodes.append(Node(int(node_id), float(x), float(y)))
+                x, y = parts
+                nodes.append(Node(float(x), float(y)))
         elif section == "elements":
             parts = [p.strip() for p in line.split(",") if p.strip()]
+            parts = parts[1:]  # Skip element ID
             if len(parts) >= ELEMENT_BUFFER_SIZE:
-                elem_id = int(parts[0])
-                node_ids = list(map(int, parts[1:]))
-                elements.append(Element(elem_id, node_ids))
+                node_ids = list(map(int, parts))
+                elements.append(Element(node_ids))
 
         elif section == "bc":
             numbers = [int(x.strip()) for x in line.split(",") if x.strip()]
@@ -96,6 +95,9 @@ if __name__ == "__main__":
     print("\n=== Elements ===")
     for elem in grid.elements:
         print(elem)
+        for node_id in elem.node_ids:
+            print(grid.nodes[node_id-1], end=" ")
+        print()
 
     print("\n=== Boundary Conditions ===")
     print(grid.bc_nodes)
