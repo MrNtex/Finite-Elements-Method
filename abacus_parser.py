@@ -81,23 +81,3 @@ def parse_simulation_file(path: str):
     grid = Grid(nodes, elements, bc_nodes)
 
     return global_data_obj, grid
-
-
-if __name__ == "__main__":
-    global_data, grid = parse_simulation_file("mesh.txt")
-
-    print("=== Global Data ===")
-    print(global_data)
-    print("\n=== Nodes ===")
-    for node in grid.nodes:
-        print(node)
-
-    print("\n=== Elements ===")
-    for elem in grid.elements:
-        print(elem)
-        for node_id in elem.node_ids:
-            print(grid.nodes[node_id-1], end=" ")
-        print()
-
-    print("\n=== Boundary Conditions ===")
-    print(grid.bc_nodes)
