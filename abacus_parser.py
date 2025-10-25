@@ -2,34 +2,9 @@ import re
 from dataclasses import dataclass
 from typing import List, Dict
 
-@dataclass
-class Node:
-    x: float
-    y: float
+from fem_types import GlobalData, Grid, Node, Element
 
-@dataclass
-class Element:
-    node_ids: List[int]
-
-@dataclass
-class GlobalData:
-    SimulationTime: float
-    SimulationStepTime: float
-    Conductivity: float
-    Alfa: float
-    Tot: float
-    InitialTemp: float
-    Density: float
-    SpecificHeat: float
-
-@dataclass
-class Grid:
-    nodes: List[Node]
-    elements: List[Element]
-    bc_nodes: List[int]
-
-
-def parse_simulation_file(path: str):
+def parse_simulation_file(path: str) -> (GlobalData, Grid):
     with open(path, "r") as f:
         lines = [line.strip() for line in f if line.strip()]
 
