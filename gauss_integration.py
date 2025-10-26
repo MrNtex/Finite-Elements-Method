@@ -15,24 +15,21 @@ GAUSS_QUADRATURE = {
     }
 }
 
-def gauss_integrate_1d(func, a, b, points=2):
+def gauss_integrate_1d(func, points=2):
     quad = GAUSS_QUADRATURE[points]
     nodes, weights = quad["nodes"], quad["weights"]
     result = 0.0
     for xi, wi in zip(nodes, weights):
-        x_mapped = (b - a)/2 * xi + (a + b)/2
-        result += wi * func(x_mapped)
-    result *= (b - a)/2
+        result += wi * func(xi)
+
     return result
 
-def gauss_integrate_2d(func, ax, bx, ay, by, points=2):
+def gauss_integrate_2d(func, points=2):
     quad = GAUSS_QUADRATURE[points]
     nodes, weights = quad["nodes"], quad["weights"]
     result = 0.0
-    for i, xi in enumerate(nodes):
-        for j, yj in enumerate(nodes):
-            x_mapped = (bx - ax)/2 * xi + (ax + bx)/2
-            y_mapped = (by - ay)/2 * yj + (ay + by)/2
-            result += weights[i] * weights[j] * func(x_mapped, y_mapped)
-    result *= (bx - ax)/2 * (by - ay)/2
+    for xi, wxi in zip(nodes, weights):
+        for yi, wyi in zip(nodes, weights):
+            result += wxi * wyi * func(xi, yi)
+    
     return result
