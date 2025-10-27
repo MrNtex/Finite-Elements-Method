@@ -4,6 +4,7 @@ from typing import List
 from jacobian import Jacobian
 from config import NUMBER_OF_INTEGRATION_POINTS
 from gauss_integration import GAUSS_QUADRATURE
+from fem_types import GlobalData
 
 def transform_local_derivatives_to_global(
     dN_d_epsilon: np.matrix,
@@ -26,6 +27,7 @@ def generate_H_matrix(
     dN_d_x: np.matrix,
     dN_d_y: np.matrix,
     jacobians: List[Jacobian],
+    globalData: GlobalData,
 ) -> np.matrix:
     H_matrix = np.zeros((4, 4))
 
@@ -35,13 +37,10 @@ def generate_H_matrix(
             weight = GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["weights"][ip_index_x] * GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["weights"][ip_index_y]
             detJ = jacobians[ip_index].detJ
 
-            print(f"Integration Point {ip_index}: weight={weight}, detJ={detJ}")
-            print(dN_d_x[ip_index, :])
-            print(dN_d_x[ip_index, :].T)
             partial_H_matrix = (
-                (dN_d_x[ip_index, :] @ dN_d_x[ip_index, :].T) +
-                (dN_d_y[ip_index, :] @ dN_d_y[ip_index, :].T)
-            ) * weight * detJ
+                np.outer(dN_d_x[ip_index, :], dN_d_x[ip_index, :]) +
+                np.outer(dN_d_y[ip_index, :], dN_d_y[ip_index, :])
+            ) * weight * detJ * globalData.Conductivity
 
             H_matrix += partial_H_matrix
 

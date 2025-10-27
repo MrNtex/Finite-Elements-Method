@@ -29,7 +29,8 @@ if __name__ == '__main__':
         H_matrix = generate_H_matrix(
             dN_d_x,
             dN_d_y,
-            element.jacobian
+            element.jacobian,
+            global_data
         )
         print(f"Element {element.node_ids} H matrix:")
         print(H_matrix)
