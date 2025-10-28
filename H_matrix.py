@@ -10,7 +10,7 @@ def transform_local_derivatives_to_global(
     dN_d_epsilon: np.matrix,
     dN_d_eta: np.matrix,
     jacobians: List[Jacobian],
-) -> (np.matrix, np.matrix):
+) -> tuple[np.matrix, np.matrix]:
     dN_d_x = np.zeros(dN_d_epsilon.shape)
     dN_d_y = np.zeros(dN_d_eta.shape)
 
