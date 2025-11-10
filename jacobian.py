@@ -21,7 +21,6 @@ class UniversalJacobian:
       for i, xi in enumerate(nodes):
           idx = j * NUMBER_OF_INTEGRATION_POINTS + i
 
-          print(i, j, xi, eta, idx)
           self.dN_d_epsilon[idx, 0] = -0.25 * (1 - eta)
           self.dN_d_epsilon[idx, 1] =  0.25 * (1 - eta)
           self.dN_d_epsilon[idx, 2] =  0.25 * (1 + eta)
