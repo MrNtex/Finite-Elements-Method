@@ -2,7 +2,7 @@ from typing import List
 import numpy as np
 from math import sqrt
 
-from fem_types import Element, GlobalData
+from fem_types import Element, GlobalData, Grid
 from config import NUMBER_OF_INTEGRATION_POINTS
 from gauss_integration import GAUSS_QUADRATURE
     
@@ -39,23 +39,28 @@ def generate_Hbc_matrix_for_side(
     element: Element,
     node_ids: tuple[int, int],
     globalData: GlobalData,
-    shape_functions: np.matrix
+    shape_functions: np.matrix,
+    grid: Grid,
 ) -> np.matrix:
     Hbc_matrix = np.zeros((4, 4))
 
-    detJ = sqrt(element.node_ids[node_ids[0]]**2 + element.node_ids[node_ids[1]]**2) / 2
+    delta_x = (grid.nodes[element.node_ids[node_ids[1]]-1].x - grid.nodes[element.node_ids[node_ids[0]]-1].x)
+    delta_y = (grid.nodes[element.node_ids[node_ids[1]]-1].y - grid.nodes[element.node_ids[node_ids[0]]-1].y)
+    detJ = sqrt(delta_x**2 + delta_y**2) / 2
+    #print(f"detJ for side {node_ids} of element {element.node_ids}: {detJ}")
 
     for ip_index in range(NUMBER_OF_INTEGRATION_POINTS):
         weight = GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["weights"][ip_index]
 
-        partial_Hbc_matrix = np.outer(shape_functions[ip_index], shape_functions[ip_index]) * weight * detJ * globalData.Conductivity
+        partial_Hbc_matrix = np.outer(shape_functions[ip_index], shape_functions[ip_index]) * weight * detJ * globalData.Alfa
         Hbc_matrix += partial_Hbc_matrix
 
     return Hbc_matrix
 
 def generate_Hbc_matrix(
     element: Element,
-    globalData,
+    globalData: GlobalData,
+    grid: Grid,
 ) -> np.matrix:
     Hbc_matrix = np.zeros((4, 4))
     shape_functions_at_boundary = generate_shape_functions_at_boundary()
@@ -68,11 +73,15 @@ def generate_Hbc_matrix(
     ]
 
     for edge_index, node_ids in enumerate(edges):
+        if (element.node_ids[node_ids[0]] not in grid.bc_nodes or
+            element.node_ids[node_ids[1]] not in grid.bc_nodes):
+            continue
         Hbc_matrix += generate_Hbc_matrix_for_side(
             element,
             node_ids,
             globalData,
-            shape_functions_at_boundary[edge_index, :, :]
+            shape_functions_at_boundary[edge_index, :, :],
+            grid
         )
 
     return Hbc_matrix

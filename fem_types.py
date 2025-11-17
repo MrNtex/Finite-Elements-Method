@@ -36,4 +36,4 @@ class GlobalData:
 class Grid:
     nodes: List[Node]
     elements: List[Element]
-    bc_nodes: List[int]
+    bc_nodes: set[int]

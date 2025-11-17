@@ -44,7 +44,7 @@ if __name__ == '__main__':
             print(f"Element {element.node_ids} H matrix:")
             print(H_matrix)
 
-        Hbc_matrix = generate_Hbc_matrix(element, global_data)
+        Hbc_matrix = generate_Hbc_matrix(element, global_data, grid)
 
         if DEBUG or True:
             print(f"Element {element.node_ids} Hbc matrix:")

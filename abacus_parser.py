@@ -11,7 +11,7 @@ def parse_simulation_file(path: str) -> (GlobalData, Grid):
     global_data = {}
     nodes = []
     elements = []
-    bc_nodes = []
+    bc_nodes = set()
 
     section = None
 
@@ -50,7 +50,7 @@ def parse_simulation_file(path: str) -> (GlobalData, Grid):
 
         elif section == "bc":
             numbers = [int(x.strip()) for x in line.split(",") if x.strip()]
-            bc_nodes.extend(numbers)
+            bc_nodes.update(numbers)
 
     global_data_obj = GlobalData(**global_data)
     grid = Grid(nodes, elements, bc_nodes)
