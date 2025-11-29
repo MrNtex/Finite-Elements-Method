@@ -35,14 +35,15 @@ def generate_shape_functions_at_boundary() -> np.matrix:
         shape_functions[3, i, 3] = 0.25 * (1 - (-1)) * (1 + xi)
     return shape_functions
 
-def generate_Hbc_matrix_for_side(
+def generate_Hbc_matrix_P_vector_for_side(
     element: Element,
     node_ids: tuple[int, int],
     globalData: GlobalData,
     shape_functions: np.matrix,
     grid: Grid,
-) -> np.matrix:
+) -> tuple[np.matrix, np.matrix]:
     Hbc_matrix = np.zeros((4, 4))
+    P_vector = np.zeros(4)
 
     delta_x = (grid.nodes[element.node_ids[node_ids[1]]-1].x - grid.nodes[element.node_ids[node_ids[0]]-1].x)
     delta_y = (grid.nodes[element.node_ids[node_ids[1]]-1].y - grid.nodes[element.node_ids[node_ids[0]]-1].y)
@@ -55,14 +56,18 @@ def generate_Hbc_matrix_for_side(
         partial_Hbc_matrix = np.outer(shape_functions[ip_index], shape_functions[ip_index]) * weight * detJ * globalData.Alfa
         Hbc_matrix += partial_Hbc_matrix
 
-    return Hbc_matrix
+        partial_P_vector = shape_functions[ip_index] * weight * detJ * globalData.Alfa * globalData.Tot
+        P_vector += partial_P_vector
 
-def generate_Hbc_matrix(
+    return Hbc_matrix, P_vector
+
+def generate_Hbc_matrix_and_P_vector(
     element: Element,
     globalData: GlobalData,
     grid: Grid,
-) -> np.matrix:
+) -> tuple[np.matrix, np.matrix]:
     Hbc_matrix = np.zeros((4, 4))
+    P_vector = np.zeros(4)
     shape_functions_at_boundary = generate_shape_functions_at_boundary()
 
     edges = [
@@ -76,12 +81,14 @@ def generate_Hbc_matrix(
         if (element.node_ids[node_ids[0]] not in grid.bc_nodes or
             element.node_ids[node_ids[1]] not in grid.bc_nodes):
             continue
-        Hbc_matrix += generate_Hbc_matrix_for_side(
+        hbc_part, p_part = generate_Hbc_matrix_P_vector_for_side(
             element,
             node_ids,
             globalData,
             shape_functions_at_boundary[edge_index, :, :],
             grid
         )
+        Hbc_matrix += hbc_part
+        P_vector += p_part
 
-    return Hbc_matrix
+    return Hbc_matrix, P_vector
