@@ -45,7 +45,8 @@ if __name__ == '__main__':
 
         for i_local, node_id_i in enumerate(element.node_ids):
             for j_local, node_id_j in enumerate(element.node_ids):
-                print(f"Adding H[{i_local},{j_local}] ({H_matrix[i_local, j_local]}) to global H[{node_id_i - 1},{node_id_j - 1}] ({aggregated_H_matrix[node_id_i - 1, node_id_j - 1]})")
+                if DEBUG:
+                    print(f"Adding H[{i_local},{j_local}] ({H_matrix[i_local, j_local]}) to global H[{node_id_i - 1},{node_id_j - 1}] ({aggregated_H_matrix[node_id_i - 1, node_id_j - 1]})")
                 aggregated_H_matrix[node_id_i - 1, node_id_j - 1] += H_matrix[i_local, j_local]
 
     if DEBUG or True:
