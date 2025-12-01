@@ -10,15 +10,17 @@ from fem_types import Jacobian, Node, Element, Grid
 class UniversalJacobian:
   dN_d_epsilon: np.matrix
   dN_d_eta: np.matrix
+  N_functions: np.matrix
 
   def __init__(self):
     self.dN_d_epsilon = np.zeros((NUMBER_OF_INTEGRATION_POINTS**2, 4))
     self.dN_d_eta = np.zeros((NUMBER_OF_INTEGRATION_POINTS**2, 4))
+    self.N_functions = np.zeros((NUMBER_OF_INTEGRATION_POINTS**2, 4))
 
-    nodes = np.array(GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["nodes"])
+    integration_nodes = np.array(GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["nodes"])
 
-    for j, eta in enumerate(nodes):
-      for i, xi in enumerate(nodes):
+    for j, eta in enumerate(integration_nodes):
+      for i, xi in enumerate(integration_nodes):
           idx = j * NUMBER_OF_INTEGRATION_POINTS + i
 
           self.dN_d_epsilon[idx, 0] = -0.25 * (1 - eta)
@@ -30,6 +32,11 @@ class UniversalJacobian:
           self.dN_d_eta[idx, 1] = -0.25 * (1 + xi)
           self.dN_d_eta[idx, 2] =  0.25 * (1 + xi)
           self.dN_d_eta[idx, 3] =  0.25 * (1 - xi)
+
+          self.N_functions[idx, 0] = 0.25 * (1 - xi) * (1 - eta)
+          self.N_functions[idx, 1] = 0.25 * (1 + xi) * (1 - eta)
+          self.N_functions[idx, 2] = 0.25 * (1 + xi) * (1 + eta)
+          self.N_functions[idx, 3] = 0.25 * (1 - xi) * (1 + eta)
 
 def calculate_jacobian_for_finite_element(
     element: Element,

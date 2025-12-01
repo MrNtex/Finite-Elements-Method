@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List
 
-from jacobian import Jacobian
+from jacobian import Jacobian, UniversalJacobian
 from config import NUMBER_OF_INTEGRATION_POINTS
 from gauss_integration import GAUSS_QUADRATURE
 from fem_types import GlobalData
@@ -23,13 +23,15 @@ def transform_local_derivatives_to_global(
 
     return dN_d_x, dN_d_y
 
-def generate_H_matrix(
+def generate_H_and_C_matrix(
     dN_d_x: np.matrix,
     dN_d_y: np.matrix,
+    N_functions: np.matrix,
     jacobians: List[Jacobian],
     globalData: GlobalData,
-) -> np.matrix:
+) -> tuple[np.matrix, np.matrix]:
     H_matrix = np.zeros((4, 4))
+    C_matrix = np.zeros((4, 4))
 
     for ip_index_x in range(NUMBER_OF_INTEGRATION_POINTS):
         for ip_index_y in range(NUMBER_OF_INTEGRATION_POINTS):
@@ -42,6 +44,12 @@ def generate_H_matrix(
                 np.outer(dN_d_y[ip_index, :], dN_d_y[ip_index, :])
             ) * weight * detJ * globalData.Conductivity
 
-            H_matrix += partial_H_matrix
+            partial_C_matrix = (
+                  np.outer(N_functions[ip_index, :], N_functions[ip_index, :])
+                  * weight * detJ * globalData.Density * globalData.SpecificHeat
+            )
 
-    return H_matrix
+            H_matrix += partial_H_matrix
+            C_matrix += partial_C_matrix
+
+    return H_matrix, C_matrix
