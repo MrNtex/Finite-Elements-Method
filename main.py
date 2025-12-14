@@ -1,10 +1,11 @@
-from config import DEBUG, FILE_PATH
+from config import DEBUG, FILE_PATH, SAVE_TO_CSV
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
 from abaqus_parser import parse_simulation_file
 from element_matrices import transform_local_derivatives_to_global, generate_H_and_C_matrix
 from boudary_matrices import generate_Hbc_matrix_and_P_vector
 
 import numpy as np
+import pandas as pd
 
 if __name__ == '__main__':
     uj = UniversalJacobian()
@@ -12,6 +13,11 @@ if __name__ == '__main__':
     global_data, grid = parse_simulation_file(FILE_PATH)
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     time = 0
+
+    if SAVE_TO_CSV:
+        results_history = {}
+        results_history["Time_0.0"] = t0.copy()
+        summary_stats = []
 
     while time < global_data.SimulationTime:
         if DEBUG or True:
@@ -100,4 +106,19 @@ if __name__ == '__main__':
             print("Resulting t matrix for the entire grid:")
             #print(t0)
             print("Min: ", np.min(t0), " Max: ", np.max(t0))
+
         time += global_data.SimulationStepTime
+        if SAVE_TO_CSV:
+            results_history[f"Time_{time}"] = t0.copy()
+            summary_stats.append({
+                "Time": time,
+                "MinTemp": round(np.min(t0), 2),
+                "MaxTemp": round(np.max(t0), 2),
+            })
+
+    if SAVE_TO_CSV:
+        print("\nSaving results to CSV file...")
+        df_summary = pd.DataFrame(summary_stats)
+        filename_summary = "simulation_min_max.csv"
+        df_summary.to_csv(filename_summary, index=False)
+        print(f"Saved min/max summary to {filename_summary}")

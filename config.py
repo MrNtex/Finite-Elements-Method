@@ -1,4 +1,5 @@
 
-NUMBER_OF_INTEGRATION_POINTS = 3
+NUMBER_OF_INTEGRATION_POINTS = 4
 DEBUG = False
-FILE_PATH = "meshes/Test3_31_31_kwadrat.txt"
+FILE_PATH = "meshes/Test2_4_4_MixGrid.txt"
+SAVE_TO_CSV = True
