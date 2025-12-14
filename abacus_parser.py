@@ -1,10 +1,8 @@
 import re
-from dataclasses import dataclass
-from typing import List, Dict
 
 from fem_types import GlobalData, Grid, Node, Element
 
-def parse_simulation_file(path: str) -> (GlobalData, Grid):
+def parse_simulation_file(path: str) -> tuple[GlobalData, Grid]:
     with open(path, "r") as f:
         lines = [line.strip() for line in f if line.strip()]
 

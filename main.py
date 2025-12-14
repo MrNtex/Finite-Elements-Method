@@ -1,22 +1,21 @@
-from config import DEBUG
-from gauss_integration import gauss_integrate_1d, gauss_integrate_2d
+from config import DEBUG, FILE_PATH
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
 from abacus_parser import parse_simulation_file
-from Element_matrices import transform_local_derivatives_to_global, generate_H_and_C_matrix
-from Boudary_matrices import generate_Hbc_matrix_and_P_vector
+from element_matrices import transform_local_derivatives_to_global, generate_H_and_C_matrix
+from boudary_matrices import generate_Hbc_matrix_and_P_vector
 
 import numpy as np
 
 if __name__ == '__main__':
     uj = UniversalJacobian()
 
-    global_data, grid = parse_simulation_file("Test1_4_4.txt")
+    global_data, grid = parse_simulation_file(FILE_PATH)
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     time = 0
 
     while time < global_data.SimulationTime:
         if DEBUG or True:
-            print(f"\n--- Time step {time} ---\n")
+            print(f"\n--- Time {time+1}s ---\n")
         aggregated_H_matrix = np.zeros((len(grid.nodes), len(grid.nodes)))
         aggregated_C_matrix = np.zeros((len(grid.nodes), len(grid.nodes)))
         aggregated_P_vector = np.zeros(len(grid.nodes))
@@ -89,11 +88,13 @@ if __name__ == '__main__':
             print(aggregated_C_matrix)
 
         eq_left_matrix = aggregated_H_matrix + (aggregated_C_matrix / global_data.SimulationStepTime)
-        print("Equation left matrix:")
-        print(eq_left_matrix)
+        if DEBUG:
+            print("Equation left matrix:")
+            print(eq_left_matrix)
         eq_right_matrix = aggregated_P_vector + ((aggregated_C_matrix / global_data.SimulationStepTime) @ t0)
-        print("Equation right matrix:")
-        print(eq_right_matrix)
+        if DEBUG:
+            print("Equation right matrix:")
+            print(eq_right_matrix)
         t0 = np.linalg.solve(eq_left_matrix, eq_right_matrix)
         if DEBUG or True:
             print("Resulting t matrix for the entire grid:")

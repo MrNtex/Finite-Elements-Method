@@ -40,22 +40,3 @@ GAUSS_QUADRATURE = {
         ]
     }
 }
-
-def gauss_integrate_1d(func, points=2):
-    quad = GAUSS_QUADRATURE[points]
-    nodes, weights = quad["nodes"], quad["weights"]
-    result = 0.0
-    for xi, wi in zip(nodes, weights):
-        result += wi * func(xi)
-
-    return result
-
-def gauss_integrate_2d(func, points=2):
-    quad = GAUSS_QUADRATURE[points]
-    nodes, weights = quad["nodes"], quad["weights"]
-    result = 0.0
-    for xi, wxi in zip(nodes, weights):
-        for yi, wyi in zip(nodes, weights):
-            result += wxi * wyi * func(xi, yi)
-    
-    return result
