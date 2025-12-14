@@ -1,6 +1,6 @@
 from config import DEBUG, FILE_PATH
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
-from abacus_parser import parse_simulation_file
+from abaqus_parser import parse_simulation_file
 from element_matrices import transform_local_derivatives_to_global, generate_H_and_C_matrix
 from boudary_matrices import generate_Hbc_matrix_and_P_vector
 
