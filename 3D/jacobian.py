@@ -91,7 +91,7 @@ def calculate_jacobian_for_finite_element(
     jacobians = []
 
     for integration_point_index in range(universal_jacobian.num_points):
-      dN_d_xi = universal_jacobian.dN_d_epsilon[integration_point_index, :]
+      dN_d_xi = universal_jacobian.dN_d_xi[integration_point_index, :]
       dN_d_eta = universal_jacobian.dN_d_eta[integration_point_index, :]
       dN_d_zeta = universal_jacobian.dN_d_zeta[integration_point_index, :]
 
@@ -107,6 +107,9 @@ def calculate_jacobian_for_finite_element(
       J[2, 0] = np.sum(dN_d_zeta * nodes_x) # dx/d_zeta
       J[2, 1] = np.sum(dN_d_zeta * nodes_y) # dy/d_zeta
       J[2, 2] = np.sum(dN_d_zeta * nodes_z) # dz/d_zeta
+
+      if np.linalg.det(J) <= 1e-15: 
+        print(f"CRITICAL ERROR: Element {element.node_ids} has detJ = {np.linalg.det(J)}!")
       jacobians.append(Jacobian(J=J, invJ=np.linalg.inv(J), detJ=np.linalg.det(J)))
 
     return jacobians

@@ -1,16 +1,21 @@
-from config import DEBUG, FILE_PATH, SAVE_TO_CSV
+from config import DEBUG, SAVE_TO_CSV
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
-from abaqus_parser import parse_simulation_file
+from mesh_generator.mesh_config import get_global_data
 from element_matrices import transform_local_derivatives_to_global, generate_H_and_C_matrix
 from boudary_matrices import generate_Hbc_matrix_and_P_vector
+from mesh_generator.mesh_generator import MeshGenerator
 
 import numpy as np
 import pandas as pd
 
+
 if __name__ == '__main__':
     uj = UniversalJacobian()
 
-    global_data, grid = parse_simulation_file(FILE_PATH)
+    global_data = get_global_data()
+    generator = MeshGenerator(width=0.04, depth=0.04, height=0.005, nx=15, ny=15, nz=8)
+
+    grid = generator.generate_grid(paste_pattern="full")
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     time = 0
 
@@ -34,9 +39,10 @@ if __name__ == '__main__':
                     print(j)
                     print('\n')
 
-            dN_d_x, dN_d_y = transform_local_derivatives_to_global(
-                uj.dN_d_epsilon,
+            dN_d_x, dN_d_y, dN_d_z = transform_local_derivatives_to_global(
+                uj.dN_d_xi,
                 uj.dN_d_eta,
+                uj.dN_d_zeta,
                 element.jacobian
             )
 
@@ -49,9 +55,11 @@ if __name__ == '__main__':
             H_matrix, C_matrix = generate_H_and_C_matrix(
                 dN_d_x,
                 dN_d_y,
+                dN_d_z,
                 uj.N_functions,
                 element.jacobian,
-                global_data
+                global_data,
+                element
             )
 
             if DEBUG:

@@ -4,7 +4,7 @@ from typing import List
 from jacobian import Jacobian, UniversalJacobian
 from config import NUMBER_OF_INTEGRATION_POINTS
 from gauss_integration import GAUSS_QUADRATURE
-from fem_types import GlobalData
+from fem_types import Element, GlobalData
 
 def transform_local_derivatives_to_global(
     dN_d_xi: np.matrix,
@@ -39,11 +39,11 @@ def generate_H_and_C_matrix(
     N_functions: np.matrix,
     jacobians: List[Jacobian],
     globalData: GlobalData,
+    element: Element
 ) -> tuple[np.matrix, np.matrix]:
     H_matrix = np.zeros((8, 8))
     C_matrix = np.zeros((8, 8))
 
-    conductivity = globalData.Conductivity 
     density = globalData.Density
     specific_heat = globalData.SpecificHeat
     
@@ -60,7 +60,7 @@ def generate_H_and_C_matrix(
                     np.outer(dN_d_x[ip_index, :], dN_d_x[ip_index, :]) +
                     np.outer(dN_d_y[ip_index, :], dN_d_y[ip_index, :]) +
                     np.outer(dN_d_z[ip_index, :], dN_d_z[ip_index, :])
-                ) * conductivity * weight * detJ
+                ) * element.k * weight * detJ
 
                 partial_C = (
                     np.outer(N_functions[ip_index, :], N_functions[ip_index, :])
