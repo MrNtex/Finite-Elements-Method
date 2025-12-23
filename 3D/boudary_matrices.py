@@ -1,94 +1,88 @@
-from typing import List
 import numpy as np
-from math import sqrt
-
 from fem_types import Element, GlobalData, Grid
 from config import NUMBER_OF_INTEGRATION_POINTS
 from gauss_integration import GAUSS_QUADRATURE
-    
-def generate_shape_functions_at_boundary() -> np.matrix:
-    shape_functions = np.zeros((4, NUMBER_OF_INTEGRATION_POINTS, 4))
 
-    for i, xi in enumerate(GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["nodes"]):
-        # Bottom edge (eta = -1)
-        shape_functions[0, i, 0] = 0.25 * (1 - xi) * (1 - (-1))
-        shape_functions[0, i, 1] = 0.25 * (1 + xi) * (1 - (-1))
-        shape_functions[0, i, 2] = 0.25 * (1 + xi) * (1 + (-1))
-        shape_functions[0, i, 3] = 0.25 * (1 - xi) * (1 + (-1))
+HEX_FACES = [
+    [0, 3, 2, 1], # -Z
+    [4, 5, 6, 7], # +Z
+    [0, 1, 5, 4], # -Y
+    [1, 2, 6, 5], # +X
+    [2, 3, 7, 6], # +Y
+    [3, 0, 4, 7]  # -X
+]
 
-        # Right edge (ksi = 1)
-        shape_functions[1, i, 0] = 0.25 * (1 - 1) * (1 - xi)
-        shape_functions[1, i, 1] = 0.25 * (1 + 1) * (1 - xi)
-        shape_functions[1, i, 2] = 0.25 * (1 + 1) * (1 + xi)
-        shape_functions[1, i, 3] = 0.25 * (1 - 1) * (1 + xi)
-
-        # Top edge (eta = 1)
-        shape_functions[2, i, 0] = 0.25 * (1 - xi) * (1 - 1)
-        shape_functions[2, i, 1] = 0.25 * (1 + xi) * (1 - 1)
-        shape_functions[2, i, 2] = 0.25 * (1 + xi) * (1 + 1)
-        shape_functions[2, i, 3] = 0.25 * (1 - xi) * (1 + 1)
-
-        # Left edge (ksi = -1)
-        shape_functions[3, i, 0] = 0.25 * (1 - (-1)) * (1 - xi)
-        shape_functions[3, i, 1] = 0.25 * (1 + (-1)) * (1 - xi)
-        shape_functions[3, i, 2] = 0.25 * (1 + (-1)) * (1 + xi)
-        shape_functions[3, i, 3] = 0.25 * (1 - (-1)) * (1 + xi)
-    return shape_functions
-
-def generate_Hbc_matrix_P_vector_for_side(
-    element: Element,
-    node_ids: tuple[int, int],
-    globalData: GlobalData,
-    shape_functions: np.matrix,
-    grid: Grid,
-) -> tuple[np.matrix, np.matrix]:
-    Hbc_matrix = np.zeros((4, 4))
-    P_vector = np.zeros(4)
-
-    delta_x = (grid.nodes[element.node_ids[node_ids[1]]-1].x - grid.nodes[element.node_ids[node_ids[0]]-1].x)
-    delta_y = (grid.nodes[element.node_ids[node_ids[1]]-1].y - grid.nodes[element.node_ids[node_ids[0]]-1].y)
-    detJ = sqrt(delta_x**2 + delta_y**2) / 2
-    #print(f"detJ for side {node_ids} of element {element.node_ids}: {detJ}")
-
-    for ip_index in range(NUMBER_OF_INTEGRATION_POINTS):
-        weight = GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["weights"][ip_index]
-
-        partial_Hbc_matrix = np.outer(shape_functions[ip_index], shape_functions[ip_index]) * weight * detJ * globalData.Alfa
-        Hbc_matrix += partial_Hbc_matrix
-
-        partial_P_vector = shape_functions[ip_index] * weight * detJ * globalData.Alfa * globalData.Tot
-        P_vector += partial_P_vector
-
-    return Hbc_matrix, P_vector
+def get_face_shape_fns_and_derivs(u, v):
+    N = np.array([
+        0.25 * (1 - u) * (1 - v),
+        0.25 * (1 + u) * (1 - v),
+        0.25 * (1 + u) * (1 + v),
+        0.25 * (1 - u) * (1 + v)
+    ])
+    dN_du = np.array([
+        -0.25 * (1 - v),
+         0.25 * (1 - v),
+         0.25 * (1 + v),
+        -0.25 * (1 + v)
+    ])
+    dN_dv = np.array([
+        -0.25 * (1 - u),
+        -0.25 * (1 + u),
+         0.25 * (1 + u),
+         0.25 * (1 - u)
+    ])
+    return N, dN_du, dN_dv
 
 def generate_Hbc_matrix_and_P_vector(
     element: Element,
     globalData: GlobalData,
-    grid: Grid,
+    grid: Grid
 ) -> tuple[np.matrix, np.matrix]:
-    Hbc_matrix = np.zeros((4, 4))
-    P_vector = np.zeros(4)
-    shape_functions_at_boundary = generate_shape_functions_at_boundary()
+    
+    Hbc_matrix = np.zeros((8, 8))
+    P_vector = np.zeros(8)
+    
+    gauss_points = GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["nodes"]
+    weights = GAUSS_QUADRATURE[NUMBER_OF_INTEGRATION_POINTS]["weights"]
 
-    edges = [
-        (0, 1),
-        (1, 2),
-        (2, 3),
-        (3, 0)
-    ]
-
-    for edge_index, node_ids in enumerate(edges):
-        if (element.node_ids[node_ids[0]] not in grid.bc_nodes or
-            element.node_ids[node_ids[1]] not in grid.bc_nodes):
+    for face_local_ids in HEX_FACES:        
+        is_boundary_face = True
+        for local_id in face_local_ids:
+            global_id = element.node_ids[local_id]
+            if grid.nodes[global_id - 1].bc_flag == 0:
+                is_boundary_face = False
+                break
+        
+        if not is_boundary_face:
             continue
-        hbc_part, p_part = generate_Hbc_matrix_P_vector_for_side(
-            element,
-            node_ids,
-            globalData,
-            shape_functions_at_boundary[edge_index, :, :],
-            grid
-        )
-        Hbc_matrix += hbc_part
-        P_vector += p_part
 
+        face_nodes = [grid.nodes[element.node_ids[lid]-1] for lid in face_local_ids]
+        xs = np.array([n.x for n in face_nodes])
+        ys = np.array([n.y for n in face_nodes])
+        zs = np.array([n.z for n in face_nodes])
+
+        for i, u in enumerate(gauss_points):
+            for j, v in enumerate(gauss_points):
+                weight = weights[i] * weights[j]
+                N_2d, dN_du, dN_dv = get_face_shape_fns_and_derivs(u, v)
+                
+                dx_du = np.sum(dN_du * xs)
+                dy_du = np.sum(dN_du * ys)
+                dz_du = np.sum(dN_du * zs)
+                t_u = np.array([dx_du, dy_du, dz_du])
+                
+                dx_dv = np.sum(dN_dv * xs)
+                dy_dv = np.sum(dN_dv * ys)
+                dz_dv = np.sum(dN_dv * zs)
+                t_v = np.array([dx_dv, dy_dv, dz_dv])
+                
+                normal_vector = np.cross(t_u, t_v)
+                detJ_surf = np.linalg.norm(normal_vector)
+
+                N_3d_on_face = np.zeros(8)
+                for k, local_node_idx in enumerate(face_local_ids):
+                    N_3d_on_face[local_node_idx] = N_2d[k]
+                Hbc_matrix += np.outer(N_3d_on_face, N_3d_on_face) * globalData.Alfa * detJ_surf * weight
+                P_vector += N_3d_on_face * globalData.Alfa * globalData.Tot * detJ_surf * weight
+                
     return Hbc_matrix, P_vector

@@ -8,14 +8,14 @@ from fem_types import Jacobian, Node, Element, Grid
 
 @dataclass
 class UniversalJacobian:
-  num_points: int = NUMBER_OF_INTEGRATION_POINTS ** 3
-  dN_d_epsilon: np.matrix
+  dN_d_xi: np.matrix
   dN_d_eta: np.matrix
   dN_d_zeta: np.matrix
   N_functions: np.matrix
+  num_points: int = NUMBER_OF_INTEGRATION_POINTS ** 3
 
   def __init__(self):
-    self.dN_d_epsilon = np.zeros((self.num_points, 8))
+    self.dN_d_xi = np.zeros((self.num_points, 8))
     self.dN_d_eta = np.zeros((self.num_points, 8))
     self.dN_d_zeta = np.zeros((self.num_points, 8))
     self.N_functions = np.zeros((self.num_points, 8))
@@ -26,7 +26,6 @@ class UniversalJacobian:
     for zeta in integration_nodes:      # Z Axis (Height)
       for eta in integration_nodes:   # Y Axis (Depth)
         for xi in integration_nodes:# X Axis (Width)
-                
           # --- LOWER NODES (zeta = -1) ---
           
           # Node 0 (-1, -1, -1)

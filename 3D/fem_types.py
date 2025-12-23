@@ -16,11 +16,13 @@ class Node:
     x: float
     y: float
     z: float
+    bc_flag: int  # 0 = no BC, 1 = BC applied
 
 @dataclass
 class Element:
     node_ids: List[int]
     jacobian: List[Jacobian] = None
+    k: float = 0.0
 
 @dataclass
 class GlobalData:
