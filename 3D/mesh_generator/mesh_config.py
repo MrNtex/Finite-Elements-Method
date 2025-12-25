@@ -9,14 +9,23 @@ class MaterialConstants:
     K_AIR: float     = 0.026
     K_HEATSINK: float= 200.0
 
+@dataclass
+class MaterialHeights:
+    SILICON_HEIGHT: float = 5  # %
+    IHS_HEIGHT: float     = 5 # %
+    PASTE_HEIGHT: float   = 2  # %
+    RADIATOR_HEIGHT: float= 88  # %
+
+CPU_POWER: float = 65.0 # in Watts
+
 def get_global_data() -> GlobalData:
     return GlobalData(
         SimulationTime=100.0,
         SimulationStepTime=0.1,
         Conductivity=0.0,
-        Alfa=25.0,
+        Alfa=2000.0,
         Tot=25.0,
-        InitialTemp=100.0,
+        InitialTemp=25.0,
         Density=2330.0,
         SpecificHeat=700.0
     )

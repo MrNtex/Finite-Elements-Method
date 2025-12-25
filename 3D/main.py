@@ -1,8 +1,8 @@
 from config import DEBUG, SAVE_TO_CSV
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
 from mesh_generator.mesh_config import get_global_data
-from element_matrices import transform_local_derivatives_to_global, generate_H_and_C_matrix
-from boudary_matrices import generate_Hbc_matrix_and_P_vector
+from element_matrices import transform_local_derivatives_to_global, calculate_element_matrices
+from boundary_matrices import generate_Hbc_matrix_and_P_vector
 from mesh_generator.mesh_generator import MeshGenerator
 
 import numpy as np
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     uj = UniversalJacobian()
 
     global_data = get_global_data()
-    generator = MeshGenerator(width=0.04, depth=0.04, height=0.005, nx=15, ny=15, nz=8)
+    generator = MeshGenerator(width=0.04, depth=0.04, height=0.03, nx=15, ny=15, nz=60)
 
     grid = generator.generate_grid(paste_pattern="full")
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
@@ -52,7 +52,7 @@ if __name__ == '__main__':
                 print(f"Element {element.node_ids} dN/dy:")
                 print(dN_d_y)
 
-            H_matrix, C_matrix = generate_H_and_C_matrix(
+            H_matrix, C_matrix, P_source_vector = calculate_element_matrices(
                 dN_d_x,
                 dN_d_y,
                 dN_d_z,
@@ -70,7 +70,7 @@ if __name__ == '__main__':
                 print(f"Element {element.node_ids} C matrix:")
                 print(C_matrix)
 
-            Hbc_matrix, P_vector = generate_Hbc_matrix_and_P_vector(element, global_data, grid)
+            Hbc_matrix, P_bc_vector = generate_Hbc_matrix_and_P_vector(element, global_data, grid)
             if DEBUG:
                 print(f"Element {element.node_ids} Hbc matrix:")
                 print(Hbc_matrix)
@@ -82,11 +82,11 @@ if __name__ == '__main__':
                     aggregated_H_matrix[node_id_i - 1, node_id_j - 1] += H_matrix[i_local, j_local]
                     aggregated_C_matrix[node_id_i - 1, node_id_j - 1] += C_matrix[i_local, j_local]
 
-            if DEBUG:
-                    print(f"P Vector: {P_vector} for element {element.node_ids}")
+            # if DEBUG:
+            #         print(f"P Vector: {P_vector} for element {element.node_ids}")
 
             for i_local, node_id_i in enumerate(element.node_ids):
-                aggregated_P_vector[node_id_i - 1] += P_vector[i_local]
+                aggregated_P_vector[node_id_i - 1] += P_bc_vector[i_local] + P_source_vector[i_local]
 
         np.set_printoptions(linewidth=np.inf, precision=3, suppress=True)
         if DEBUG:

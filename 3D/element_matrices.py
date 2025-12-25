@@ -32,7 +32,7 @@ def transform_local_derivatives_to_global(
 
     return dN_d_x, dN_d_y, dN_d_z
 
-def generate_H_and_C_matrix(
+def calculate_element_matrices(
     dN_d_x: np.matrix,
     dN_d_y: np.matrix,
     dN_d_z: np.matrix,
@@ -40,9 +40,10 @@ def generate_H_and_C_matrix(
     jacobians: List[Jacobian],
     globalData: GlobalData,
     element: Element
-) -> tuple[np.matrix, np.matrix]:
+) -> tuple[np.matrix, np.matrix, np.matrix]:
     H_matrix = np.zeros((8, 8))
     C_matrix = np.zeros((8, 8))
+    P_source_vector = np.zeros(8)
 
     density = globalData.Density
     specific_heat = globalData.SpecificHeat
@@ -68,5 +69,6 @@ def generate_H_and_C_matrix(
 
                 H_matrix += partial_H
                 C_matrix += partial_C
+                P_source_vector += N_functions[ip_index, :] * element.Q * weight * detJ
 
-    return H_matrix, C_matrix
+    return H_matrix, C_matrix, P_source_vector

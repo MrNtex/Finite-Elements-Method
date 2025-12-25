@@ -1,6 +1,6 @@
 import numpy as np
 from fem_types import Grid, Node, Element
-from .mesh_config import MaterialConstants
+from .mesh_config import MaterialConstants, MaterialHeights, CPU_POWER
 
 class MeshGenerator:
     def __init__(self, width, depth, height, nx, ny, nz):
@@ -19,7 +19,31 @@ class MeshGenerator:
         self.dz = height / nz
 
     def generate_grid(self, paste_pattern="full"):
-        print(f"Generowanie siatki 3D: {self.nx}x{self.ny}x{self.nz} elementów...")
+        print(f"Generating 3D mesh: {self.nx}x{self.ny}x{self.nz} elements...")
+        n_silicon = int(self.nz * (MaterialHeights.SILICON_HEIGHT / 100))
+        n_ihs     = int(self.nz * (MaterialHeights.IHS_HEIGHT / 100))
+        
+        n_paste   = int(self.nz * (MaterialHeights.PASTE_HEIGHT / 100))
+        if n_paste < 1 or n_silicon < 1 or n_ihs < 1:
+            raise ValueError("Error: Material layer heights too small for the given nz. Increase nz or layer heights.")
+        n_heatsink = self.nz - n_silicon - n_ihs - n_paste
+        idx_silicon_end = n_silicon
+        idx_ihs_end     = idx_silicon_end + n_ihs
+        idx_paste_end   = idx_ihs_end + n_paste
+
+        print(f"Layer distribution (k indices):")
+        print(f" - Silicon:  0  to {idx_silicon_end - 1} \t({n_silicon} layers)")
+        print(f" - IHS:      {idx_silicon_end} to {idx_ihs_end - 1} \t({n_ihs} layers)")
+        print(f" - Paste:    {idx_ihs_end} to {idx_paste_end - 1} \t({n_paste} layers) -> Pattern: {paste_pattern}")
+        print(f" - Heatsink: {idx_paste_end} to {self.nz - 1} \t({n_heatsink} layers)")
+
+        if n_heatsink < 0:
+            raise ValueError("Error: Layer configuration results in negative heatsink layers. Adjust material heights or total nz.")
+
+        silicon_volume = self.width * self.depth * (n_silicon * self.dz)
+        silicon_Q = CPU_POWER / silicon_volume
+        print(f"Calculated silicon heat generation Q: {silicon_Q} W/m^3")
+
         nodes = []
         elements = []
 
@@ -49,11 +73,6 @@ class MeshGenerator:
         K_AIR = MaterialConstants.K_AIR
         K_HEATSINK = MaterialConstants.K_HEATSINK
 
-        # 0-1: Silicon, 2-5: IHS, 6: Paste, 7-9: Radiator
-        z_silicon_end = int(0.2 * self.nz)
-        z_ihs_end = int(0.6 * self.nz)
-        z_paste_layer = z_ihs_end
-
         for k in range(self.nz):
             for j in range(self.ny):
                 for i in range(self.nx):
@@ -68,11 +87,12 @@ class MeshGenerator:
                         nodes_map[i,   j+1, k+1]  # 7
                     ]
                     element = Element(n_ids)
-                    if k < z_silicon_end:
+                    if k < idx_silicon_end:
                         element.k = K_SILICON
-                    elif k < z_paste_layer:
+                        element.Q = silicon_Q
+                    elif k < idx_ihs_end:
                         element.k = K_IHS
-                    elif k == z_paste_layer:
+                    elif k < idx_paste_end:
                         center_x = (i + 0.5) * self.dx
                         center_y = (j + 0.5) * self.dy
                         
