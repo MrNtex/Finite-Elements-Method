@@ -7,6 +7,8 @@ from mesh_generator.mesh_generator import MeshGenerator
 
 import numpy as np
 import pandas as pd
+from scipy.sparse import lil_matrix
+from scipy.sparse.linalg import spsolve
 
 
 if __name__ == '__main__':
