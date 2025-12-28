@@ -5,7 +5,7 @@ from fem_types import GlobalData
 class MaterialConstants:
     K_SILICON: float = 150.0
     K_IHS: float     = 380.0
-    K_PASTE: float   = 8.5
+    K_PASTE: float   = 85.0
     K_AIR: float     = 0.026
     K_HEATSINK: float= 200.0
 
@@ -23,7 +23,7 @@ def get_global_data() -> GlobalData:
         SimulationTime=100.0,
         SimulationStepTime=0.1,
         Conductivity=0.0,
-        Alfa=2000.0,
+        Alfa=50000.0,
         Tot=25.0,
         InitialTemp=25.0,
         Density=2330.0,
