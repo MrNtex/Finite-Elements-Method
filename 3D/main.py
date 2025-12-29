@@ -1,4 +1,4 @@
-from config import DEBUG, SAVE_TO_CSV
+from config import DEBUG, SAVE_TO_CSV, PLOT_SAVE_INTERVAL
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
 from mesh_generator.mesh_config import get_global_data
 from element_matrices import transform_local_derivatives_to_global, calculate_element_matrices
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     global_data = get_global_data()
     
     generator = MeshGenerator(width=0.04, depth=0.04, height=0.03, nx=15, ny=15, nz=20)
-    grid = generator.generate_grid(paste_pattern=PastePattern.TWO_LINES)
+    grid = generator.generate_grid(paste_pattern=PastePattern.X_SHAPE)
     
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     current_time = 0
@@ -73,8 +73,10 @@ if __name__ == '__main__':
         summary_stats = []
 
     print("--- STARTING TIME SIMULATION ---")
-    plot_update_interval = 1.0
+    plot_update_interval = PLOT_SAVE_INTERVAL
     last_plot_time = -plot_update_interval
+
+    simulation_history = [t0.copy()]
     
     while current_time < global_data.SimulationTime:
         rhs_vector = global_P + (global_C.dot(t0) / dt)
@@ -86,6 +88,10 @@ if __name__ == '__main__':
         current_time += dt
         min_t = np.min(t0)
         max_t = np.max(t0)
+
+        if current_time - last_plot_time >= plot_update_interval:
+            simulation_history.append(t0.copy())
+            last_plot_time = current_time
         
         if DEBUG or True:
             print(f"Time: {current_time:.2f}s | Min: {min_t:.2f} | Max: {max_t:.2f}")
@@ -97,7 +103,7 @@ if __name__ == '__main__':
                 "MaxTemp": round(max_t, 2),
             })
     
-    plot_grid(grid, t0)
+    plot_grid(grid, simulation_history)
 
     if SAVE_TO_CSV:
         print("\nSaving results...")

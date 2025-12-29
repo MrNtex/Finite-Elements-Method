@@ -16,7 +16,7 @@ class MaterialHeights:
     PASTE_HEIGHT: float   = 5  # %
     RADIATOR_HEIGHT: float= 20  # %
 
-CPU_POWER: float = 95.0 # in Watts
+CPU_POWER: float = 595.0 # in Watts
 
 def get_global_data() -> GlobalData:
     return GlobalData(
@@ -25,7 +25,7 @@ def get_global_data() -> GlobalData:
         Conductivity=0.0,
         Alfa=50000.0,
         Tot=25.0,
-        InitialTemp=15.0,
+        InitialTemp=30.0, # For best result set to WaterTemp
         Density=2330.0,
         SpecificHeat=700.0,
         WaterTemp=30.0
