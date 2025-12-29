@@ -134,5 +134,13 @@ class MeshGenerator:
             dist1 = abs((x - cx) - (y - cy)) / np.sqrt(2)
             dist2 = abs((x - cx) + (y - cy)) / np.sqrt(2)
             return dist1 < line_width or dist2 < line_width
+        elif pattern == "two_lines":
+            line_thickness = self.width * 0.1
+            pos1 = self.width * 0.33
+            pos2 = self.width * 0.66
+            
+            is_line1 = abs(x - pos1) < (line_thickness / 2)
+            is_line2 = abs(x - pos2) < (line_thickness / 2)
+            return is_line1 or is_line2
 
         return False

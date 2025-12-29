@@ -17,7 +17,7 @@ if __name__ == '__main__':
     global_data = get_global_data()
     
     generator = MeshGenerator(width=0.04, depth=0.04, height=0.03, nx=15, ny=15, nz=20)
-    grid = generator.generate_grid(paste_pattern="x_shape")
+    grid = generator.generate_grid(paste_pattern="two_lines")
     
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     current_time = 0
