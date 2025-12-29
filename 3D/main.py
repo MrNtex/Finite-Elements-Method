@@ -4,6 +4,7 @@ from mesh_generator.mesh_config import get_global_data
 from element_matrices import transform_local_derivatives_to_global, calculate_element_matrices
 from boundary_matrices import generate_Hbc_matrix_and_P_vector
 from mesh_generator.mesh_generator import MeshGenerator
+from plot_grid import plot_grid
 
 import numpy as np
 import pandas as pd
@@ -15,8 +16,8 @@ if __name__ == '__main__':
     uj = UniversalJacobian()
     global_data = get_global_data()
     
-    generator = MeshGenerator(width=0.04, depth=0.04, height=0.03, nx=15, ny=15, nz=60)
-    grid = generator.generate_grid(paste_pattern="full")
+    generator = MeshGenerator(width=0.04, depth=0.04, height=0.03, nx=15, ny=15, nz=20)
+    grid = generator.generate_grid(paste_pattern="x_shape")
     
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     current_time = 0
@@ -57,6 +58,14 @@ if __name__ == '__main__':
     
     dt = global_data.SimulationStepTime
     lhs_matrix = global_H + (global_C / dt)
+
+    dirichlet_indices = [i for i, node in enumerate(grid.nodes) if node.dirichlet_bc]
+    lhs_matrix = lhs_matrix.tolil()
+
+    for idx in dirichlet_indices:
+        lhs_matrix[idx, :] = 0
+        lhs_matrix[idx, idx] = 1.0
+    lhs_matrix = lhs_matrix.tocsr()
     
     if SAVE_TO_CSV:
         results_history = {}
@@ -68,8 +77,10 @@ if __name__ == '__main__':
     last_plot_time = -plot_update_interval
     
     while current_time < global_data.SimulationTime:
-
         rhs_vector = global_P + (global_C.dot(t0) / dt)
+        for idx in dirichlet_indices:
+            rhs_vector[idx] = global_data.WaterTemp
+        
         t0 = spsolve(lhs_matrix, rhs_vector)
         
         current_time += dt
@@ -85,6 +96,8 @@ if __name__ == '__main__':
                 "MinTemp": round(min_t, 2),
                 "MaxTemp": round(max_t, 2),
             })
+    
+    plot_grid(grid, t0)
 
     if SAVE_TO_CSV:
         print("\nSaving results...")

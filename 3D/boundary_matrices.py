@@ -49,7 +49,7 @@ def generate_Hbc_matrix_and_P_vector(
         is_boundary_face = True
         for local_id in face_local_ids:
             global_id = element.node_ids[local_id]
-            if grid.nodes[global_id - 1].bc_flag == 0:
+            if not grid.nodes[global_id - 1].convection_bc:
                 is_boundary_face = False
                 break
         

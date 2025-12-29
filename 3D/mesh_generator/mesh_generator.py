@@ -18,7 +18,7 @@ class MeshGenerator:
         self.dy = depth / ny
         self.dz = height / nz
 
-    def generate_grid(self, paste_pattern="full"):
+    def generate_grid(self, paste_pattern="full") -> Grid:
         print(f"Generating 3D mesh: {self.nx}x{self.ny}x{self.nz} elements...")
         n_silicon = int(self.nz * (MaterialHeights.SILICON_HEIGHT / 100))
         n_ihs     = int(self.nz * (MaterialHeights.IHS_HEIGHT / 100))
@@ -57,15 +57,22 @@ class MeshGenerator:
                     y = j * self.dy
                     z = k * self.dz
                     
-                    new_node = Node(node_id_counter, x, y, z)
-                    if k == self.nz: 
-                        new_node.bc_flag = 1
-                    
+                    new_node = Node(x, y, z)
+
+                    is_side_x = (i == 0 or i == self.nx)
+                    is_side_y = (j == 0 or j == self.ny)
+                    in_radiator_zone = (k >= idx_paste_end)
+
+                    if in_radiator_zone:
+                        new_node.dirichlet_bc = True
+                        new_node.convection_bc = False
+                    elif (is_side_x or is_side_y) and in_radiator_zone:
+                        new_node.dirichlet_bc = False
+                        new_node.convection_bc = True
+
                     nodes.append(new_node)
                     nodes_map[i, j, k] = node_id_counter
                     node_id_counter += 1
-
-        element_id_counter = 1
 
         K_SILICON = MaterialConstants.K_SILICON
         K_IHS = MaterialConstants.K_IHS

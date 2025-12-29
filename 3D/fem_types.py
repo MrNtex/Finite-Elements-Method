@@ -16,7 +16,8 @@ class Node:
     x: float
     y: float
     z: float
-    bc_flag: int  # 0 = no BC, 1 = BC applied
+    convection_bc: bool = False
+    dirichlet_bc: bool = False
 
 @dataclass
 class Element:
@@ -35,6 +36,7 @@ class GlobalData:
     InitialTemp: float
     Density: float
     SpecificHeat: float
+    WaterTemp: float
 
 @dataclass
 class Grid:
