@@ -1,9 +1,17 @@
-import numpy as np
 from fem_types import Grid, Node, Element
 from .mesh_config import MaterialConstants, MaterialHeights, CPU_POWER
 
+import numpy as np
+from enum import Enum
+
+class PastePattern(Enum):
+    FULL = "full"
+    DOT = "dot"
+    X_SHAPE = "x_shape"
+    TWO_LINES = "two_lines"
+
 class MeshGenerator:
-    def __init__(self, width, depth, height, nx, ny, nz):
+    def __init__(self, width: float, depth: float, height: float, nx: int, ny: int, nz: int):
         """
         width, depth, height: Physical dimensions of the 3D object [m]
         nx, ny, nz: Number of elements along each axis
@@ -18,7 +26,7 @@ class MeshGenerator:
         self.dy = depth / ny
         self.dz = height / nz
 
-    def generate_grid(self, paste_pattern="full") -> Grid:
+    def generate_grid(self, paste_pattern: PastePattern = PastePattern.FULL) -> Grid:
         print(f"Generating 3D mesh: {self.nx}x{self.ny}x{self.nz} elements...")
         n_silicon = int(self.nz * (MaterialHeights.SILICON_HEIGHT / 100))
         n_ihs     = int(self.nz * (MaterialHeights.IHS_HEIGHT / 100))
@@ -117,24 +125,24 @@ class MeshGenerator:
         grid = Grid(nodes, elements)
         return grid
 
-    def _is_paste_at(self, x, y, pattern):
+    def _is_paste_at(self, x, y, pattern: PastePattern) -> bool:
         cx = self.width / 2
         cy = self.depth / 2
-        
-        if pattern == "full":
+
+        if pattern == PastePattern.FULL:
             return True
-            
-        elif pattern == "dot":
+
+        elif pattern == PastePattern.DOT:
             radius = self.width * 0.15
             dist = np.sqrt((x - cx)**2 + (y - cy)**2)
             return dist <= radius
-            
-        elif pattern == "x_shape":
+
+        elif pattern == PastePattern.X_SHAPE:
             line_width = self.width * 0.1 
             dist1 = abs((x - cx) - (y - cy)) / np.sqrt(2)
             dist2 = abs((x - cx) + (y - cy)) / np.sqrt(2)
             return dist1 < line_width or dist2 < line_width
-        elif pattern == "two_lines":
+        elif pattern == PastePattern.TWO_LINES:
             line_thickness = self.width * 0.1
             pos1 = self.width * 0.33
             pos2 = self.width * 0.66

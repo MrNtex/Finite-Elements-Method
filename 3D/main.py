@@ -3,7 +3,7 @@ from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
 from mesh_generator.mesh_config import get_global_data
 from element_matrices import transform_local_derivatives_to_global, calculate_element_matrices
 from boundary_matrices import generate_Hbc_matrix_and_P_vector
-from mesh_generator.mesh_generator import MeshGenerator
+from mesh_generator.mesh_generator import MeshGenerator, PastePattern
 from plot_grid import plot_grid
 
 import numpy as np
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     global_data = get_global_data()
     
     generator = MeshGenerator(width=0.04, depth=0.04, height=0.03, nx=15, ny=15, nz=20)
-    grid = generator.generate_grid(paste_pattern="two_lines")
+    grid = generator.generate_grid(paste_pattern=PastePattern.TWO_LINES)
     
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     current_time = 0
