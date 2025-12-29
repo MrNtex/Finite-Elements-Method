@@ -1,8 +1,16 @@
 import re
+import warnings
 
 from fem_types import GlobalData, Grid, Node, Element
 
 def parse_simulation_file(path: str) -> tuple[GlobalData, Grid]:
+    warnings.warn(
+        "parse_simulation_file is currently limited to 2D geometry. "
+        "Future versions will require a 3D update.",
+        category=PendingDeprecationWarning, 
+        stacklevel=2
+    )
+    
     with open(path, "r") as f:
         lines = [line.strip() for line in f if line.strip()]
 

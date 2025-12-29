@@ -12,7 +12,7 @@ HEX_FACES = [
     [3, 0, 4, 7]  # -X
 ]
 
-def get_face_shape_fns_and_derivs(u, v):
+def get_face_shape_fns_and_derivs(u: float, v: float) -> tuple[np.array, np.array, np.array]:
     N = np.array([
         0.25 * (1 - u) * (1 - v),
         0.25 * (1 + u) * (1 - v),

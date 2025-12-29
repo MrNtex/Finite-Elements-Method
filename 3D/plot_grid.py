@@ -34,7 +34,5 @@ def plot_grid(grid: Grid, t0: np.ndarray) -> None:
     plotter.add_mesh(mesh, scalars="Temperature", cmap="jet", show_edges=True)
     plotter.add_axes()
     plotter.add_text(f"Symulacja FEM\nMax Temp: {np.max(t0):.1f} C", position='upper_left')
-
-    # Clip to see inside
     plotter.add_mesh_clip_plane(mesh, scalars="Temperature", cmap="jet", assign_to_axis='x')
     plotter.show()
