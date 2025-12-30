@@ -65,7 +65,7 @@ def calculate_element_matrices(
 
                 partial_C = (
                     np.outer(N_functions[ip_index, :], N_functions[ip_index, :])
-                ) * density * specific_heat * weight * detJ
+                ) * element.rho * element.cp * weight * detJ
 
                 H_matrix += partial_H
                 C_matrix += partial_C

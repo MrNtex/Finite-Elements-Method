@@ -82,11 +82,7 @@ class MeshGenerator:
                     nodes_map[i, j, k] = node_id_counter
                     node_id_counter += 1
 
-        K_SILICON = MaterialConstants.K_SILICON
-        K_IHS = MaterialConstants.K_IHS
-        K_PASTE = MaterialConstants.K_PASTE
-        K_AIR = MaterialConstants.K_AIR
-        K_HEATSINK = MaterialConstants.K_HEATSINK
+        MC = MaterialConstants
 
         for k in range(self.nz):
             for j in range(self.ny):
@@ -103,21 +99,31 @@ class MeshGenerator:
                     ]
                     element = Element(n_ids)
                     if k < idx_silicon_end:
-                        element.k = K_SILICON
+                        element.k = MC.K_SILICON
+                        element.rho = MC.RHO_SILICON
+                        element.cp = MC.C_SILICON
                         element.Q = silicon_Q
                     elif k < idx_ihs_end:
-                        element.k = K_IHS
+                        element.k = MC.K_IHS
+                        element.rho = MC.RHO_IHS
+                        element.cp = MC.C_IHS
                     elif k < idx_paste_end:
                         center_x = (i + 0.5) * self.dx
                         center_y = (j + 0.5) * self.dy
                         
                         if self._is_paste_at(center_x, center_y, paste_pattern):
-                            element.k = K_PASTE
+                            element.k = MC.K_PASTE
+                            element.rho = MC.RHO_PASTE
+                            element.cp = MC.C_PASTE
                         else:
-                            element.k = K_AIR
+                            element.k = MC.K_AIR
+                            element.rho = MC.RHO_AIR
+                            element.cp = MC.C_AIR
                     else:
-                        element.k = K_HEATSINK
-                    
+                        element.k = MC.K_HEATSINK
+                        element.rho = MC.RHO_HEATSINK
+                        element.cp = MC.C_HEATSINK
+
                     elements.append(element)
 
         print(f"Finished. Generated {len(nodes)} nodes and {len(elements)} elements.")

@@ -24,6 +24,8 @@ class Element:
     node_ids: List[int]
     jacobian: List[Jacobian] = None
     k: float = 0.0
+    rho: float = 0.0
+    cp: float = 0.0
     Q: float = 0.0  # Heat generation per unit volume
 
 @dataclass

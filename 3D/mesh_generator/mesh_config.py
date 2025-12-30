@@ -3,11 +3,26 @@ from fem_types import GlobalData
 
 @dataclass
 class MaterialConstants:
+    # Thermal Conductivity in W/mK
     K_SILICON: float = 150.0
     K_IHS: float     = 380.0
-    K_PASTE: float   = 80.0
+    K_PASTE: float   = 80.0 # Effective (bounded by density of the mesh)
     K_AIR: float     = 0.026
     K_HEATSINK: float= 200.0
+
+    # Density in kg/m3
+    RHO_SILICON: float  = 2330.0
+    RHO_IHS: float      = 8960.0
+    RHO_PASTE: float    = 2500.0
+    RHO_AIR: float      = 1.2
+    RHO_HEATSINK: float = 2700.0 
+
+    # Specific Heat Capacity in J/kgK
+    C_SILICON: float = 700.0
+    C_IHS: float     = 385.0
+    C_PASTE: float   = 800.0
+    C_AIR: float     = 1005.0
+    C_HEATSINK: float= 900.0
 
 @dataclass
 class MaterialHeights:
