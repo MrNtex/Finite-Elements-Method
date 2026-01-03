@@ -1,0 +1,204 @@
+Generating 3D mesh: 25x25x30 elements...
+Layer distribution (k indices):
+ - Silicon:  0  to 9    (10 layers)
+ - IHS:      10 to 21   (12 layers)
+ - Paste:    22 to 22   (1 layers) -> Pattern: PastePattern.X_SHAPE
+ - Heatsink: 23 to 29   (7 layers)
+Calculated silicon heat generation Q: 37187499.99999999 W/m^3
+Finished. Generated 20956 nodes and 18750 elements.
+Nodes: 20956
+--- STARTING ASSEMBLY OF MATRICES (This may take a moment...) ---
+100%|█████████████████████| 18750/18750 [00:41<00:00, 451.82it/s]
+--- END OF ASSEMBLY. CONVERTING TO CSR... ---
+--- STARTING TIME SIMULATION ---
+Time: 1.00s | Min: 30.00 | Max: 42.17
+Time: 2.00s | Min: 30.00 | Max: 49.24
+Time: 3.00s | Min: 30.00 | Max: 53.91
+Time: 4.00s | Min: 30.00 | Max: 57.24
+Time: 5.00s | Min: 30.00 | Max: 59.69
+Time: 6.00s | Min: 30.00 | Max: 61.51
+Time: 7.00s | Min: 30.00 | Max: 62.88
+Time: 8.00s | Min: 30.00 | Max: 63.90
+Time: 9.00s | Min: 30.00 | Max: 64.66
+Time: 10.00s | Min: 30.00 | Max: 65.24
+Time: 11.00s | Min: 30.00 | Max: 65.67
+Time: 12.00s | Min: 30.00 | Max: 65.99
+Time: 13.00s | Min: 30.00 | Max: 66.24
+Time: 14.00s | Min: 30.00 | Max: 66.42
+Time: 15.00s | Min: 30.00 | Max: 66.56
+Time: 16.00s | Min: 30.00 | Max: 66.66
+Time: 17.00s | Min: 30.00 | Max: 66.74
+Time: 18.00s | Min: 30.00 | Max: 66.79
+Time: 19.00s | Min: 30.00 | Max: 66.84
+Time: 20.00s | Min: 30.00 | Max: 66.87
+Time: 21.00s | Min: 30.00 | Max: 66.89
+Time: 22.00s | Min: 30.00 | Max: 66.91
+Time: 23.00s | Min: 30.00 | Max: 66.93
+Time: 24.00s | Min: 30.00 | Max: 66.94
+Time: 25.00s | Min: 30.00 | Max: 66.94
+Time: 26.00s | Min: 30.00 | Max: 66.95
+Time: 27.00s | Min: 30.00 | Max: 66.95
+Time: 28.00s | Min: 30.00 | Max: 66.96
+Time: 29.00s | Min: 30.00 | Max: 66.96
+Time: 30.00s | Min: 30.00 | Max: 66.96
+Time: 31.00s | Min: 30.00 | Max: 66.96
+Time: 32.00s | Min: 30.00 | Max: 66.96
+Time: 33.00s | Min: 30.00 | Max: 66.97
+Time: 34.00s | Min: 30.00 | Max: 66.97
+Time: 35.00s | Min: 30.00 | Max: 66.97
+Time: 36.00s | Min: 30.00 | Max: 66.97
+Time: 37.00s | Min: 30.00 | Max: 66.97
+Time: 38.00s | Min: 30.00 | Max: 66.97
+Time: 39.00s | Min: 30.00 | Max: 66.97
+Time: 40.00s | Min: 30.00 | Max: 66.97
+Time: 41.00s | Min: 30.00 | Max: 66.97
+Time: 42.00s | Min: 30.00 | Max: 66.97
+Time: 43.00s | Min: 30.00 | Max: 66.97
+Time: 44.00s | Min: 30.00 | Max: 66.97
+Time: 45.00s | Min: 30.00 | Max: 66.97
+Time: 46.00s | Min: 30.00 | Max: 66.97
+Time: 47.00s | Min: 30.00 | Max: 66.97
+Time: 48.00s | Min: 30.00 | Max: 66.97
+Time: 49.00s | Min: 30.00 | Max: 66.97
+Time: 50.00s | Min: 30.00 | Max: 66.97
+
+Saving results...
+Saved.
+(.venv) arturniemiec@Arturs-MacBook-Air FEM % /Users/arturniemiec
+/Documents/FEM/.venv/bin/python /Users/arturniemiec/Documents/FEM
+/3D/main.py
+Generating 3D mesh: 25x25x30 elements...
+Layer distribution (k indices):
+ - Silicon:  0  to 9    (10 layers)
+ - IHS:      10 to 21   (12 layers)
+ - Paste:    22 to 22   (1 layers) -> Pattern: PastePattern.FULL
+ - Heatsink: 23 to 29   (7 layers)
+Calculated silicon heat generation Q: 37187499.99999999 W/m^3
+Finished. Generated 20956 nodes and 18750 elements.
+Nodes: 20956
+--- STARTING ASSEMBLY OF MATRICES (This may take a moment...) ---
+100%|█████████████████████| 18750/18750 [00:42<00:00, 441.84it/s]
+--- END OF ASSEMBLY. CONVERTING TO CSR... ---
+--- STARTING TIME SIMULATION ---
+Time: 1.00s | Min: 30.00 | Max: 41.90
+Time: 2.00s | Min: 30.00 | Max: 48.35
+Time: 3.00s | Min: 30.00 | Max: 52.17
+Time: 4.00s | Min: 30.00 | Max: 54.55
+Time: 5.00s | Min: 30.00 | Max: 56.06
+Time: 6.00s | Min: 30.00 | Max: 57.03
+Time: 7.00s | Min: 30.00 | Max: 57.65
+Time: 8.00s | Min: 30.00 | Max: 58.06
+Time: 9.00s | Min: 30.00 | Max: 58.31
+Time: 10.00s | Min: 30.00 | Max: 58.48
+Time: 11.00s | Min: 30.00 | Max: 58.59
+Time: 12.00s | Min: 30.00 | Max: 58.66
+Time: 13.00s | Min: 30.00 | Max: 58.71
+Time: 14.00s | Min: 30.00 | Max: 58.73
+Time: 15.00s | Min: 30.00 | Max: 58.75
+Time: 16.00s | Min: 30.00 | Max: 58.77
+Time: 17.00s | Min: 30.00 | Max: 58.77
+Time: 18.00s | Min: 30.00 | Max: 58.78
+Time: 19.00s | Min: 30.00 | Max: 58.78
+Time: 20.00s | Min: 30.00 | Max: 58.78
+Time: 21.00s | Min: 30.00 | Max: 58.79
+Time: 22.00s | Min: 30.00 | Max: 58.79
+Time: 23.00s | Min: 30.00 | Max: 58.79
+Time: 24.00s | Min: 30.00 | Max: 58.79
+Time: 25.00s | Min: 30.00 | Max: 58.79
+Time: 26.00s | Min: 30.00 | Max: 58.79
+Time: 27.00s | Min: 30.00 | Max: 58.79
+Time: 28.00s | Min: 30.00 | Max: 58.79
+Time: 29.00s | Min: 30.00 | Max: 58.79
+Time: 30.00s | Min: 30.00 | Max: 58.79
+Time: 31.00s | Min: 30.00 | Max: 58.79
+Time: 32.00s | Min: 30.00 | Max: 58.79
+Time: 33.00s | Min: 30.00 | Max: 58.79
+Time: 34.00s | Min: 30.00 | Max: 58.79
+Time: 35.00s | Min: 30.00 | Max: 58.79
+Time: 36.00s | Min: 30.00 | Max: 58.79
+Time: 37.00s | Min: 30.00 | Max: 58.79
+Time: 38.00s | Min: 30.00 | Max: 58.79
+Time: 39.00s | Min: 30.00 | Max: 58.79
+Time: 40.00s | Min: 30.00 | Max: 58.79
+Time: 41.00s | Min: 30.00 | Max: 58.79
+Time: 42.00s | Min: 30.00 | Max: 58.79
+Time: 43.00s | Min: 30.00 | Max: 58.79
+Time: 44.00s | Min: 30.00 | Max: 58.79
+Time: 45.00s | Min: 30.00 | Max: 58.79
+Time: 46.00s | Min: 30.00 | Max: 58.79
+Time: 47.00s | Min: 30.00 | Max: 58.79
+Time: 48.00s | Min: 30.00 | Max: 58.79
+Time: 49.00s | Min: 30.00 | Max: 58.79
+Time: 50.00s | Min: 30.00 | Max: 58.79
+
+Saving results.
+
+(.venv) arturniemiec@Arturs-MacBook-Air FEM % /Users/arturniemiec
+/Documents/FEM/.venv/bin/python /Users/arturniemiec/Documents/FEM
+/3D/main.py
+Generating 3D mesh: 25x25x30 elements...
+Layer distribution (k indices):
+ - Silicon:  0  to 9    (10 layers)
+ - IHS:      10 to 21   (12 layers)
+ - Paste:    22 to 22   (1 layers) -> Pattern: PastePattern.TWO_LINES
+ - Heatsink: 23 to 29   (7 layers)
+Calculated silicon heat generation Q: 37187499.99999999 W/m^3
+Finished. Generated 20956 nodes and 18750 elements.
+Nodes: 20956
+--- STARTING ASSEMBLY OF MATRICES (This may take a moment...) ---
+100%|█████████████████████| 18750/18750 [00:41<00:00, 448.09it/s]
+--- END OF ASSEMBLY. CONVERTING TO CSR... ---
+--- STARTING TIME SIMULATION ---
+Time: 1.00s | Min: 30.00 | Max: 42.38
+Time: 2.00s | Min: 30.00 | Max: 49.97
+Time: 3.00s | Min: 30.00 | Max: 55.45
+Time: 4.00s | Min: 30.00 | Max: 59.79
+Time: 5.00s | Min: 30.00 | Max: 63.36
+Time: 6.00s | Min: 30.00 | Max: 66.32
+Time: 7.00s | Min: 30.00 | Max: 68.79
+Time: 8.00s | Min: 30.00 | Max: 70.87
+Time: 9.00s | Min: 30.00 | Max: 72.60
+Time: 10.00s | Min: 30.00 | Max: 74.06
+Time: 11.00s | Min: 30.00 | Max: 75.28
+Time: 12.00s | Min: 30.00 | Max: 76.30
+Time: 13.00s | Min: 30.00 | Max: 77.16
+Time: 14.00s | Min: 30.00 | Max: 77.87
+Time: 15.00s | Min: 30.00 | Max: 78.48
+Time: 16.00s | Min: 30.00 | Max: 78.98
+Time: 17.00s | Min: 30.00 | Max: 79.40
+Time: 18.00s | Min: 30.00 | Max: 79.76
+Time: 19.00s | Min: 30.00 | Max: 80.06
+Time: 20.00s | Min: 30.00 | Max: 80.30
+Time: 21.00s | Min: 30.00 | Max: 80.51
+Time: 22.00s | Min: 30.00 | Max: 80.69
+Time: 23.00s | Min: 30.00 | Max: 80.83
+Time: 24.00s | Min: 30.00 | Max: 80.96
+Time: 25.00s | Min: 30.00 | Max: 81.06
+Time: 26.00s | Min: 30.00 | Max: 81.15
+Time: 27.00s | Min: 30.00 | Max: 81.22
+Time: 28.00s | Min: 30.00 | Max: 81.28
+Time: 29.00s | Min: 30.00 | Max: 81.33
+Time: 30.00s | Min: 30.00 | Max: 81.37
+Time: 31.00s | Min: 30.00 | Max: 81.41
+Time: 32.00s | Min: 30.00 | Max: 81.44
+Time: 33.00s | Min: 30.00 | Max: 81.46
+Time: 34.00s | Min: 30.00 | Max: 81.48
+Time: 35.00s | Min: 30.00 | Max: 81.50
+Time: 36.00s | Min: 30.00 | Max: 81.52
+Time: 37.00s | Min: 30.00 | Max: 81.53
+Time: 38.00s | Min: 30.00 | Max: 81.54
+Time: 39.00s | Min: 30.00 | Max: 81.55
+Time: 40.00s | Min: 30.00 | Max: 81.56
+Time: 41.00s | Min: 30.00 | Max: 81.56
+Time: 42.00s | Min: 30.00 | Max: 81.57
+Time: 43.00s | Min: 30.00 | Max: 81.57
+Time: 44.00s | Min: 30.00 | Max: 81.57
+Time: 45.00s | Min: 30.00 | Max: 81.58
+Time: 46.00s | Min: 30.00 | Max: 81.58
+Time: 47.00s | Min: 30.00 | Max: 81.58
+Time: 48.00s | Min: 30.00 | Max: 81.58
+Time: 49.00s | Min: 30.00 | Max: 81.59
+Time: 50.00s | Min: 30.00 | Max: 81.59
+
+Saving results...
+Saved.

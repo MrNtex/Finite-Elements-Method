@@ -1,7 +1,9 @@
+from __future__ import annotations
 from fem_types import Grid, Node, Element
 from .mesh_config import MaterialConstants, MaterialHeights, CPU_POWER
 
 import numpy as np
+from dataclasses import dataclass
 from enum import Enum
 
 class PastePattern(Enum):
@@ -10,21 +12,51 @@ class PastePattern(Enum):
     X_SHAPE = "x_shape"
     TWO_LINES = "two_lines"
 
+@dataclass
+class MeshParameters:
+    width: float = 0.04
+    depth: float = 0.04
+    height: float = 0.03
+    nx: int = 25
+    ny: int = 25
+    nz: int = 30
+
+@dataclass
+class MeshGeneratorBuilder:
+    def __init__(self):
+        self._config = MeshParameters()
+    
+    def set_parameters(self, width: float, depth: float, height: float) -> MeshGeneratorBuilder:
+        self._config.width = width
+        self._config.depth = depth
+        self._config.height = height
+        return self
+
+    def set_resolution(self, nx: int, ny: int, nz: int) -> MeshGeneratorBuilder:
+        self._config.nx = nx
+        self._config.ny = ny
+        self._config.nz = nz
+        return self
+    
+    def build(self) -> MeshGenerator:
+        return MeshGenerator(self._config)
+
 class MeshGenerator:
-    def __init__(self, width: float, depth: float, height: float, nx: int, ny: int, nz: int):
+    def __init__(self, params: MeshParameters):
         """
         width, depth, height: Physical dimensions of the 3D object [m]
         nx, ny, nz: Number of elements along each axis
         """
-        self.width = width
-        self.depth = depth
-        self.height = height
-        self.nx = nx
-        self.ny = ny
-        self.nz = nz
-        self.dx = width / nx
-        self.dy = depth / ny
-        self.dz = height / nz
+        self.width = params.width
+        self.depth = params.depth
+        self.height = params.height
+        self.nx = params.nx
+        self.ny = params.ny
+        self.nz = params.nz
+
+        self.dx = self.width / self.nx
+        self.dy = self.depth / self.ny
+        self.dz = self.height / self.nz
 
     def generate_grid(self, paste_pattern: PastePattern = PastePattern.FULL) -> Grid:
         print(f"Generating 3D mesh: {self.nx}x{self.ny}x{self.nz} elements...")
