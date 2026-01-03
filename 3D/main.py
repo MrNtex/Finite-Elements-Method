@@ -5,6 +5,7 @@ from element_matrices import transform_local_derivatives_to_global, calculate_el
 from boundary_matrices import generate_Hbc_matrix_and_P_vector
 from mesh_generator.mesh_generator import MeshGeneratorBuilder, PastePattern
 from plot_grid import plot_grid
+from units import Distance
 
 import numpy as np
 import pandas as pd
@@ -17,9 +18,9 @@ if __name__ == '__main__':
     global_data = get_global_data()
     
     generator = MeshGeneratorBuilder().set_parameters(
-        width=0.04,
-        depth=0.04,
-        height=0.03
+        width=Distance.cm(4),
+        depth=Distance.cm(4),
+        height=Distance.cm(3)
     ).set_resolution(
         nx=25,
         ny=25,

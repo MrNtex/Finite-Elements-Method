@@ -1,5 +1,6 @@
 from __future__ import annotations
 from fem_types import Grid, Node, Element
+from units import Distance
 from .mesh_config import MaterialConstants, MaterialHeights, CPU_POWER
 
 import numpy as np
@@ -14,15 +15,15 @@ class PastePattern(Enum):
 
 @dataclass
 class MeshParameters:
-    width: float = 0.04
-    depth: float = 0.04
-    height: float = 0.03
+    width: float = Distance.cm(4)
+    depth: float = Distance.cm(4)
+    height: float = Distance.cm(3)
     nx: int = 25
     ny: int = 25
     nz: int = 30
 
-    die_width: float = 0.015
-    die_depth: float = 0.012
+    die_width: float = Distance.mm(15)
+    die_depth: float = Distance.mm(12)
 
 @dataclass
 class MeshGeneratorBuilder:
