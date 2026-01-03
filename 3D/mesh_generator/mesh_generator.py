@@ -21,6 +21,9 @@ class MeshParameters:
     ny: int = 25
     nz: int = 30
 
+    die_width: float = 0.015
+    die_depth: float = 0.012
+
 @dataclass
 class MeshGeneratorBuilder:
     def __init__(self):
@@ -38,7 +41,14 @@ class MeshGeneratorBuilder:
         self._config.nz = nz
         return self
     
+    def set_die_size(self, die_width: float, die_depth: float) -> MeshGeneratorBuilder:
+        self._config.die_width = die_width
+        self._config.die_depth = die_depth
+        return self
+    
     def build(self) -> MeshGenerator:
+        if self._config.width < self._config.die_width or self._config.depth < self._config.die_depth:
+            raise ValueError("Error: Die dimensions exceed overall mesh dimensions.")
         return MeshGenerator(self._config)
 
 class MeshGenerator:
@@ -57,6 +67,9 @@ class MeshGenerator:
         self.dx = self.width / self.nx
         self.dy = self.depth / self.ny
         self.dz = self.height / self.nz
+
+        self.die_width = params.die_width
+        self.die_depth = params.die_depth
 
     def generate_grid(self, paste_pattern: PastePattern = PastePattern.FULL) -> Grid:
         print(f"Generating 3D mesh: {self.nx}x{self.ny}x{self.nz} elements...")
@@ -80,9 +93,11 @@ class MeshGenerator:
         if n_heatsink < 0:
             raise ValueError("Error: Layer configuration results in negative heatsink layers. Adjust material heights or total nz.")
 
-        silicon_volume = self.width * self.depth * (n_silicon * self.dz)
-        silicon_Q = CPU_POWER / silicon_volume
-        print(f"Calculated silicon heat generation Q: {silicon_Q} W/m^3")
+        die_volume = (self.die_width *
+                      self.die_depth *
+                      n_silicon * self.dz)
+        silicon_Q = CPU_POWER / die_volume  # W/m^3
+        print(f"Heat Source Density (Q): {silicon_Q} W/m^3")
 
         nodes = []
         elements = []
@@ -130,11 +145,15 @@ class MeshGenerator:
                         nodes_map[i,   j+1, k+1]  # 7
                     ]
                     element = Element(n_ids)
+                    center_x = (i + 0.5) * self.dx
+                    center_y = (j + 0.5) * self.dy
                     if k < idx_silicon_end:
                         element.k = MC.K_SILICON
                         element.rho = MC.RHO_SILICON
                         element.cp = MC.C_SILICON
-                        element.Q = silicon_Q
+                        if self._is_inside_die(center_x, center_y):
+                            print(f"Assigning heat source to element at layer {k}, position ({center_x:.4f}, {center_y:.4f})")
+                            element.Q = silicon_Q
                     elif k < idx_ihs_end:
                         element.k = MC.K_IHS
                         element.rho = MC.RHO_IHS
@@ -162,8 +181,16 @@ class MeshGenerator:
         
         grid = Grid(nodes, elements)
         return grid
+    
+    def _is_inside_die(self, x: float, y: float) -> bool:
+        cx = self.width / 2
+        cy = self.depth / 2
+        half_w = self.die_width / 2
+        half_d = self.die_depth / 2
 
-    def _is_paste_at(self, x, y, pattern: PastePattern) -> bool:
+        return (cx - half_w) <= x <= (cx + half_w) and (cy - half_d) <= y <= (cy + half_d)
+
+    def _is_paste_at(self, x: float, y: float, pattern: PastePattern) -> bool:
         cx = self.width / 2
         cy = self.depth / 2
 

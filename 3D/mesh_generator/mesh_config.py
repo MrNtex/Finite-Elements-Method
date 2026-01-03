@@ -31,7 +31,7 @@ class MaterialHeights:
     PASTE_HEIGHT: float   = 5  # %
     RADIATOR_HEIGHT: float= 20  # %
 
-CPU_POWER: float = 595.0 # in Watts
+CPU_POWER: float = 90.0 # in Watts
 
 def get_global_data() -> GlobalData:
     return GlobalData(
