@@ -9,6 +9,7 @@ class MaterialConstants:
     K_PASTE: float   = 80.0 # Effective (bounded by density of the mesh)
     K_AIR: float     = 0.026
     K_HEATSINK: float= 200.0
+    K_SUBSTRATE: float= 0.3 # Laminate PCB (FR4)
 
     # Density in kg/m3
     RHO_SILICON: float  = 2330.0
@@ -16,6 +17,7 @@ class MaterialConstants:
     RHO_PASTE: float    = 2500.0
     RHO_AIR: float      = 1.2
     RHO_HEATSINK: float = 2700.0 
+    RHO_SUBSTRATE: float= 1900.0
 
     # Specific Heat Capacity in J/kgK
     C_SILICON: float = 700.0
@@ -23,6 +25,7 @@ class MaterialConstants:
     C_PASTE: float   = 800.0
     C_AIR: float     = 1005.0
     C_HEATSINK: float= 900.0
+    C_SUBSTRATE: float= 1300.0
 
 @dataclass
 class MaterialHeights:

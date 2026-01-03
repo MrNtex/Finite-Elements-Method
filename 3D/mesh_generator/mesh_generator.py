@@ -149,12 +149,16 @@ class MeshGenerator:
                     center_x = (i + 0.5) * self.dx
                     center_y = (j + 0.5) * self.dy
                     if k < idx_silicon_end:
-                        element.k = MC.K_SILICON
-                        element.rho = MC.RHO_SILICON
-                        element.cp = MC.C_SILICON
                         if self._is_inside_die(center_x, center_y):
                             print(f"Assigning heat source to element at layer {k}, position ({center_x:.4f}, {center_y:.4f})")
                             element.Q = silicon_Q
+                            element.k = MC.K_SILICON
+                            element.rho = MC.RHO_SILICON
+                            element.cp = MC.C_SILICON
+                        else:
+                            element.k = MC.K_SUBSTRATE
+                            element.rho = MC.RHO_SUBSTRATE
+                            element.cp = MC.C_SUBSTRATE
                     elif k < idx_ihs_end:
                         element.k = MC.K_IHS
                         element.rho = MC.RHO_IHS

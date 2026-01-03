@@ -18,9 +18,9 @@ if __name__ == '__main__':
     global_data = get_global_data()
     
     generator = MeshGeneratorBuilder().set_parameters(
-        width=Distance.cm(4),
-        depth=Distance.cm(4),
-        height=Distance.cm(3)
+        width=Distance.cm(3),
+        depth=Distance.cm(3),
+        height=Distance.cm(2)
     ).set_resolution(
         nx=25,
         ny=25,
