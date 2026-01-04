@@ -7,13 +7,13 @@ import numpy as np
 from tqdm import tqdm
 
 from fem_types import GlobalData
-from mesh_generator.mesh_generator import MeshGeneratorBuilder
-from config import MULTIPROCESSING_ENABLED, MAX_PROCESSES
+from mesh_generator.mesh_generator import MeshGeneratorBuilder, PastePattern
+from config import MULTIPROCESSING_ENABLED, MAX_PROCESSES, RUN_ALL_PATTERNS
 from config_loader import ConfigLoader
 from simulate import simulate
 from plot_grid import plot_grid 
 
-def run_simulation_task(config_file: str):
+def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) -> str:
     process_name = multiprocessing.current_process().name
     try:
         cfg = ConfigLoader.load_from_file(config_file)
@@ -30,7 +30,7 @@ def run_simulation_task(config_file: str):
                      .set_materials(cfg.materials)
                      .set_layers(cfg.layers)
                      .set_power(cfg.power)
-                     .set_paste_pattern(cfg.paste_pattern)
+                     .set_paste_pattern(paste_pattern if paste_pattern else cfg.paste_pattern)
                      .build())
         
         grid = generator.generate_grid()
@@ -94,19 +94,33 @@ if __name__ == '__main__':
 
     if MULTIPROCESSING_ENABLED:
         num_cores = max(1, min(multiprocessing.cpu_count() - 1, MAX_PROCESSES))
+        total_tasks = len(files_to_run)
+        if RUN_ALL_PATTERNS:
+            total_tasks *= len(PastePattern)
         num_workers = min(num_cores, len(files_to_run))    
 
         with multiprocessing.Pool(processes=num_workers) as pool:
-            results = list(tqdm(
-                pool.imap_unordered(run_simulation_task, files_to_run, chunksize=1),
-                total=len(files_to_run),
-                desc="Simulations Progress"
-            ))
+            results = []
+            if RUN_ALL_PATTERNS:
+                tasks = []
+                for file in files_to_run:
+                    for pattern in PastePattern:
+                        tasks.append((file, pattern))
+                for result in tqdm(pool.starmap(run_simulation_task, tasks), total=len(tasks), desc="Simulations Progress"):
+                    results.append(result)
+            else:
+                for result in tqdm(pool.imap_unordered(run_simulation_task, files_to_run), total=len(files_to_run), desc="Simulations Progress"):
+                    results.append(result)
     else:
         results = []
         for file in tqdm(files_to_run, desc="Simulations Progress"):
-            result = run_simulation_task(file)
-            results.append(result)
+            if RUN_ALL_PATTERNS:
+                for pattern in PastePattern:
+                    result = run_simulation_task(file, paste_pattern=pattern)
+                    results.append(result)
+            else:
+                result = run_simulation_task(file)
+                results.append(result)
     total_time = time.time() - start_global
     
     print("\n--- All Simulations Finished ---")
