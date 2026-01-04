@@ -1,7 +1,6 @@
 from typing import List
 from config import DEBUG, SAVE_TO_CSV, PLOT_SAVE_INTERVAL
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
-from mesh_generator.mesh_config import get_global_data
 from element_matrices import transform_local_derivatives_to_global, calculate_element_matrices
 from boundary_matrices import generate_Hbc_matrix_and_P_vector
 from fem_types import Grid, GlobalData

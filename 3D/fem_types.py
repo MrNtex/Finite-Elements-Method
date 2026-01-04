@@ -33,8 +33,8 @@ class GlobalData:
     SimulationTime: float
     SimulationStepTime: float
     Conductivity: float
-    Alfa: float
-    Tot: float
+    Alpha: float
+    Tenv: float
     InitialTemp: float
     Density: float
     SpecificHeat: float

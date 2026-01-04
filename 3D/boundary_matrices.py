@@ -82,7 +82,7 @@ def generate_Hbc_matrix_and_P_vector(
                 N_3d_on_face = np.zeros(8)
                 for k, local_node_idx in enumerate(face_local_ids):
                     N_3d_on_face[local_node_idx] = N_2d[k]
-                Hbc_matrix += np.outer(N_3d_on_face, N_3d_on_face) * globalData.Alfa * detJ_surf * weight
-                P_vector += N_3d_on_face * globalData.Alfa * globalData.Tot * detJ_surf * weight
-                
+                Hbc_matrix += np.outer(N_3d_on_face, N_3d_on_face) * globalData.Alpha * detJ_surf * weight
+                P_vector += N_3d_on_face * globalData.Alpha * globalData.Tenv * detJ_surf * weight
+
     return Hbc_matrix, P_vector

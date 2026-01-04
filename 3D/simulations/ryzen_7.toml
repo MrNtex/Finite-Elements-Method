@@ -1,0 +1,86 @@
+
+[simulation]
+time = 50.0             # Simulation duration [s]
+step_time = 1.0         # Time step [s]
+initial_temp = 30.0     # Initial system temperature [C]
+
+[environment]
+ambient_temp = 25.0     # Ambient temperature (Tenv) [C]
+water_temp = 30.0       # Coolant temperature (Dirichlet BC) [C]
+alpha = 30.0          # Convection coefficient [W/m^2K]
+
+# ==========================================
+# Geometry & Mesh Settings
+# ==========================================
+
+[geometry]
+width = 0.03            # 3 cm [m]
+depth = 0.03            # 3 cm [m]
+height = 0.02           # 2 cm [m]
+
+[mesh]
+nx = 25                 # Resolution X
+ny = 25                 # Resolution Y
+nz = 30                 # Resolution Z (Vertical)
+
+[paste]
+run_all_patterns = false # If true, overrides pattern to run all patterns sequentially
+pattern = "x_shape"     # Options: "full", "dot", "x_shape", "two_lines"
+
+[die]
+power = 90.0            # CPU Power dissipation [W]
+
+[layers]
+# Layer heights as a percentage of the total mesh height (%)
+silicon = 35.0
+ihs = 40.0
+paste = 5.0
+radiator = 20.0
+
+# ==========================================
+# Material Properties
+# k   = Thermal Conductivity [W/mK]
+# rho = Density [kg/m^3]
+# c   = Specific Heat Capacity [J/kgK]
+# ==========================================
+
+[materials.silicon]
+k = 150.0
+rho = 2330.0
+c = 700.0
+
+[materials.ihs]
+# Integrated Heat Spreader (Copper)
+k = 380.0
+rho = 8960.0
+c = 385.0
+
+[materials.paste]
+# Thermal Interface Material
+k = 80.0        # Effective value
+rho = 2500.0
+c = 800.0
+
+[materials.air]
+# Air voids / gaps
+k = 0.026
+rho = 1.2
+c = 1005.0
+
+[materials.heatsink]
+# Heatsink (Aluminum)
+k = 200.0
+rho = 2700.0
+c = 900.0
+
+[materials.substrate]
+# PCB Laminate (FR4)
+k = 0.3
+rho = 1900.0
+c = 1300.0
+
+[defaults]
+# Default fallback values
+density = 2330.0
+specific_heat = 700.0
+conductivity = 0.0
