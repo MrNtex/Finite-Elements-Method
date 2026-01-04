@@ -2,6 +2,7 @@ from __future__ import annotations
 from fem_types import Grid, Node, Element
 from units import Distance
 from .mesh_config import MaterialConstants, MaterialHeights, CPU_POWER
+from config import DEBUG
 
 import numpy as np
 from dataclasses import dataclass
@@ -25,6 +26,8 @@ class MeshParameters:
     die_width: float = Distance.mm(15)
     die_depth: float = Distance.mm(12)
 
+    paste_pattern: PastePattern = PastePattern.FULL
+
 @dataclass
 class MeshGeneratorBuilder:
     def __init__(self):
@@ -46,7 +49,11 @@ class MeshGeneratorBuilder:
         self._config.die_width = die_width
         self._config.die_depth = die_depth
         return self
-    
+
+    def set_paste_pattern(self, paste_pattern: PastePattern) -> MeshGeneratorBuilder:
+        self._config.paste_pattern = paste_pattern
+        return self
+
     def build(self) -> MeshGenerator:
         if self._config.width < self._config.die_width or self._config.depth < self._config.die_depth:
             raise ValueError("Error: Die dimensions exceed overall mesh dimensions.")
@@ -72,7 +79,9 @@ class MeshGenerator:
         self.die_width = params.die_width
         self.die_depth = params.die_depth
 
-    def generate_grid(self, paste_pattern: PastePattern = PastePattern.FULL) -> Grid:
+        self.paste_pattern = params.paste_pattern
+
+    def generate_grid(self) -> Grid:
         print(f"Generating 3D mesh: {self.nx}x{self.ny}x{self.nz} elements...")
         n_silicon = int(self.nz * (MaterialHeights.SILICON_HEIGHT / 100))
         n_ihs     = int(self.nz * (MaterialHeights.IHS_HEIGHT / 100))
@@ -88,7 +97,7 @@ class MeshGenerator:
         print(f"Layer distribution (k indices):")
         print(f" - Silicon:  0  to {idx_silicon_end - 1} \t({n_silicon} layers)")
         print(f" - IHS:      {idx_silicon_end} to {idx_ihs_end - 1} \t({n_ihs} layers)")
-        print(f" - Paste:    {idx_ihs_end} to {idx_paste_end - 1} \t({n_paste} layers) -> Pattern: {paste_pattern}")
+        print(f" - Paste:    {idx_ihs_end} to {idx_paste_end - 1} \t({n_paste} layers) -> Pattern: {self.paste_pattern}")
         print(f" - Heatsink: {idx_paste_end} to {self.nz - 1} \t({n_heatsink} layers)")
 
         if n_heatsink < 0:
@@ -150,7 +159,8 @@ class MeshGenerator:
                     center_y = (j + 0.5) * self.dy
                     if k < idx_silicon_end:
                         if self._is_inside_die(center_x, center_y):
-                            print(f"Assigning heat source to element at layer {k}, position ({center_x:.4f}, {center_y:.4f})")
+                            if DEBUG:
+                                print(f"Assigning heat source to element at layer {k}, position ({center_x:.4f}, {center_y:.4f})")
                             element.Q = silicon_Q
                             element.k = MC.K_SILICON
                             element.rho = MC.RHO_SILICON
@@ -167,7 +177,7 @@ class MeshGenerator:
                         center_x = (i + 0.5) * self.dx
                         center_y = (j + 0.5) * self.dy
                         
-                        if self._is_paste_at(center_x, center_y, paste_pattern):
+                        if self._is_paste_at(center_x, center_y, self.paste_pattern):
                             element.k = MC.K_PASTE
                             element.rho = MC.RHO_PASTE
                             element.cp = MC.C_PASTE

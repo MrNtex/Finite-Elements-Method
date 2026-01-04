@@ -25,8 +25,9 @@ if __name__ == '__main__':
         nx=25,
         ny=25,
         nz=30
+    ).set_paste_pattern(PastePattern.X_SHAPE
     ).build()
-    grid = generator.generate_grid(paste_pattern=PastePattern.TWO_LINES)
+    grid = generator.generate_grid()
     
     t0 = np.array([global_data.InitialTemp for _ in grid.nodes])
     current_time = 0
