@@ -90,17 +90,4 @@ def simulate(grid: Grid, global_data: GlobalData) -> List[np.ndarray]:
         if DEBUG or True:
             print(f"Time: {current_time:.2f}s | Min: {min_t:.2f} | Max: {max_t:.2f}")
 
-        if SAVE_TO_CSV:
-            summary_stats.append({
-                "Time": current_time,
-                "MinTemp": round(min_t, 2),
-                "MaxTemp": round(max_t, 2),
-            })
-
-    if SAVE_TO_CSV:
-        print("\nSaving results...")
-        df_summary = pd.DataFrame(summary_stats)
-        df_summary.to_csv("simulation_optimized.csv", index=False)
-        print("Saved.")
-
     return simulation_history

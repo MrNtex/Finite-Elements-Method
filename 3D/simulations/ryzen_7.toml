@@ -24,7 +24,6 @@ ny = 25                 # Resolution Y
 nz = 30                 # Resolution Z (Vertical)
 
 [paste]
-run_all_patterns = false # If true, overrides pattern to run all patterns sequentially
 pattern = "x_shape"     # Options: "full", "dot", "x_shape", "two_lines"
 
 [die]

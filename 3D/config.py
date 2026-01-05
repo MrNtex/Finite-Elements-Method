@@ -2,9 +2,10 @@
 NUMBER_OF_INTEGRATION_POINTS = 4
 DEBUG = False
 SAVE_TO_CSV = True
-PLOT_RESULTS = True
+PLOT_MAX = True
+PLOT_GRID = True
 ENTIRE_RADIATOR_HAS_DERICHLET_BC = False # If False, only the top face has Dirichlet BC
 MULTIPROCESSING_ENABLED = True
 MAX_PROCESSES = 4
 PLOT_SAVE_INTERVAL = 1.0
-RUN_ALL_PATTERNS = True # If True, runs all mesh patterns
+RUN_ALL_PATTERNS = False # If True, runs all mesh patterns
