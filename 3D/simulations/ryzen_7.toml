@@ -24,7 +24,7 @@ ny = 25                 # Resolution Y
 nz = 30                 # Resolution Z (Vertical)
 
 [paste]
-pattern = "x_shape"     # Options: "full", "dot", "x_shape", "two_lines"
+pattern = "dot"     # Options: "full", "dot", "x_shape", "two_lines"
 
 [die]
 power = 90.0            # CPU Power dissipation [W]
