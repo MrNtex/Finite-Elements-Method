@@ -24,6 +24,13 @@ from plot_max import plot_max_temperature
 
 def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) -> str:
     process_name = multiprocessing.current_process().name
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(script_dir, "output")
+    os.makedirs(output_dir, exist_ok=True)
+    base_name = os.path.splitext(os.path.basename(config_file))[0]
+    if paste_pattern:
+        base_name += f"_{paste_pattern.name}"
+    output_path_base = os.path.join(output_dir, base_name)
     try:
         cfg = ConfigLoader.load_from_file(config_file)
     except Exception as e:
@@ -69,15 +76,18 @@ def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) ->
 
     final_step = simulation_history[-1]
     max_temp = np.max(final_step)
-    output_filename = os.path.splitext(config_file)[0] + "_result.txt"
+    output_filename = output_path_base + "_result.txt"
     with open(output_filename, "w") as f:
         f.write(f"Source Config: {config_file}\n")
+        f.write(
+            f"Pattern: {paste_pattern.name if paste_pattern else cfg.paste_pattern.name}\n"
+        )
         f.write(f"Nodes: {len(grid.nodes)}\n")
         f.write(f"Max Temp Reached: {max_temp:.2f} C\n")
         f.write(f"Compute Time: {duration:.2f} s\n")
 
     if SAVE_TO_CSV:
-        csv_filename = os.path.splitext(config_file)[0] + "_temperature_history.csv"
+        csv_filename = output_path_base + "_temperature_history.csv"
         with open(csv_filename, "w") as f:
             header = (
                 "TimeStep,"
@@ -97,7 +107,9 @@ def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) ->
             i * global_data.SimulationStepTime for i in range(len(simulation_history))
         ]
         max_temps = [np.max(step) for step in simulation_history]
-        plot_max_temperature(config_file, times, max_temps)
+        plot_max_temperature(
+            output_path_base, os.path.basename(config_file), times, max_temps
+        )
 
     return f"[{process_name}] DONE: {os.path.basename(config_file)} -> MaxT: {max_temp:.1f}C ({duration:.1f}s)"
 

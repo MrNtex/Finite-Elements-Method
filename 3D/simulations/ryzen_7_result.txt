@@ -1,4 +1,0 @@
-Source Config: /Users/arturniemiec/Documents/FEM/3D/simulations/ryzen_7.toml
-Nodes: 20956
-Max Temp Reached: 56.47 C
-Compute Time: 125.64 s
