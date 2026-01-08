@@ -1,7 +1,10 @@
 from typing import List
 from config import DEBUG, SAVE_TO_CSV, PLOT_SAVE_INTERVAL
 from jacobian import UniversalJacobian, calculate_jacobian_for_finite_element
-from element_matrices import transform_local_derivatives_to_global, calculate_element_matrices
+from element_matrices import (
+    transform_local_derivatives_to_global,
+    calculate_element_matrices,
+)
 from boundary_matrices import generate_Hbc_matrix_and_P_vector
 from fem_types import Grid, GlobalData
 
@@ -10,6 +13,7 @@ import pandas as pd
 from scipy.sparse import lil_matrix, csr_matrix
 from scipy.sparse.linalg import spsolve
 from tqdm import tqdm
+
 
 def simulate(grid: Grid, global_data: GlobalData) -> List[np.ndarray]:
     uj = UniversalJacobian()
@@ -30,26 +34,34 @@ def simulate(grid: Grid, global_data: GlobalData) -> List[np.ndarray]:
         )
 
         H_local, C_local, P_source_local = calculate_element_matrices(
-            dN_d_x, dN_d_y, dN_d_z, uj.N_functions, element.jacobian, global_data, element
+            dN_d_x,
+            dN_d_y,
+            dN_d_z,
+            uj.N_functions,
+            element.jacobian,
+            global_data,
+            element,
         )
 
-        Hbc_local, P_bc_local = generate_Hbc_matrix_and_P_vector(element, global_data, grid)
+        Hbc_local, P_bc_local = generate_Hbc_matrix_and_P_vector(
+            element, global_data, grid
+        )
         H_local += Hbc_local
-        
+
         for i_loc, node_id_i in enumerate(element.node_ids):
             idx_i = node_id_i - 1
             global_P[idx_i] += P_source_local[i_loc] + P_bc_local[i_loc]
 
             for j_loc, node_id_j in enumerate(element.node_ids):
                 idx_j = node_id_j - 1
-                
+
                 global_H[idx_i, idx_j] += H_local[i_loc, j_loc]
                 global_C[idx_i, idx_j] += C_local[i_loc, j_loc]
 
     print("--- END OF ASSEMBLY. CONVERTING TO CSR... ---")
     global_H = global_H.tocsr()
     global_C = global_C.tocsr()
-    
+
     dt = global_data.SimulationStepTime
     lhs_matrix = global_H + (global_C / dt)
 
@@ -60,7 +72,7 @@ def simulate(grid: Grid, global_data: GlobalData) -> List[np.ndarray]:
         lhs_matrix[idx, :] = 0
         lhs_matrix[idx, idx] = 1.0
     lhs_matrix = lhs_matrix.tocsr()
-    
+
     if SAVE_TO_CSV:
         results_history = {}
         results_history["Time_0.0"] = t0.copy()
@@ -71,14 +83,14 @@ def simulate(grid: Grid, global_data: GlobalData) -> List[np.ndarray]:
     last_plot_time = -plot_update_interval
 
     simulation_history = [t0.copy()]
-    
+
     while current_time < global_data.SimulationTime:
         rhs_vector = global_P + (global_C.dot(t0) / dt)
         for idx in dirichlet_indices:
             rhs_vector[idx] = global_data.WaterTemp
-        
+
         t0 = spsolve(lhs_matrix, rhs_vector)
-        
+
         current_time += dt
         min_t = np.min(t0)
         max_t = np.max(t0)
@@ -86,7 +98,7 @@ def simulate(grid: Grid, global_data: GlobalData) -> List[np.ndarray]:
         if current_time - last_plot_time >= plot_update_interval:
             simulation_history.append(t0.copy())
             last_plot_time = current_time
-        
+
         if DEBUG or True:
             print(f"Time: {current_time:.2f}s | Min: {min_t:.2f} | Max: {max_t:.2f}")
 

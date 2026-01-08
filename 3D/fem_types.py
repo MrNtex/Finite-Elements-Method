@@ -2,6 +2,7 @@ import numpy as np
 from dataclasses import dataclass
 from typing import List
 
+
 @dataclass
 class Jacobian:
     J: np.matrix
@@ -11,6 +12,7 @@ class Jacobian:
     def __repr__(self):
         return f"Jacobian(detJ={self.detJ}, J=\n{self.J}, invJ=\n{self.invJ})"
 
+
 @dataclass
 class Node:
     x: float
@@ -18,6 +20,7 @@ class Node:
     z: float
     convection_bc: bool = False
     dirichlet_bc: bool = False
+
 
 @dataclass
 class Element:
@@ -27,6 +30,7 @@ class Element:
     rho: float = 0.0
     cp: float = 0.0
     Q: float = 0.0  # Heat generation per unit volume
+
 
 @dataclass
 class GlobalData:
@@ -39,6 +43,7 @@ class GlobalData:
     Density: float
     SpecificHeat: float
     WaterTemp: float
+
 
 @dataclass
 class Grid:

@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 
+
 def plot_max_temperature(config_file, times, max_temps):
     plt.figure()
     plt.plot(times, max_temps, label="Max Temp")

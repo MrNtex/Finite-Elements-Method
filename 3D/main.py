@@ -8,11 +8,19 @@ from tqdm import tqdm
 
 from fem_types import GlobalData
 from mesh_generator.mesh_generator import MeshGeneratorBuilder, PastePattern
-from config import MULTIPROCESSING_ENABLED, MAX_PROCESSES, RUN_ALL_PATTERNS, SAVE_TO_CSV, PLOT_MAX, PLOT_GRID
+from config import (
+    MULTIPROCESSING_ENABLED,
+    MAX_PROCESSES,
+    RUN_ALL_PATTERNS,
+    SAVE_TO_CSV,
+    PLOT_MAX,
+    PLOT_GRID,
+)
 from config_loader import ConfigLoader
 from simulate import simulate
-from plot_grid import plot_grid 
+from plot_grid import plot_grid
 from plot_max import plot_max_temperature
+
 
 def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) -> str:
     process_name = multiprocessing.current_process().name
@@ -24,16 +32,18 @@ def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) ->
     start_time = time.time()
 
     try:
-        generator = (MeshGeneratorBuilder()
-                     .set_parameters(cfg.geometry.width, cfg.geometry.depth, cfg.geometry.height)
-                     .set_resolution(cfg.geometry.nx, cfg.geometry.ny, cfg.geometry.nz)
-                     .set_die_size(cfg.geometry.die_width, cfg.geometry.die_depth)
-                     .set_materials(cfg.materials)
-                     .set_layers(cfg.layers)
-                     .set_power(cfg.power)
-                     .set_paste_pattern(paste_pattern if paste_pattern else cfg.paste_pattern)
-                     .build())
-        
+        generator = (
+            MeshGeneratorBuilder()
+            .set_parameters(cfg.geometry.width, cfg.geometry.depth, cfg.geometry.height)
+            .set_resolution(cfg.geometry.nx, cfg.geometry.ny, cfg.geometry.nz)
+            .set_die_size(cfg.geometry.die_width, cfg.geometry.die_depth)
+            .set_materials(cfg.materials)
+            .set_layers(cfg.layers)
+            .set_power(cfg.power)
+            .set_paste_pattern(paste_pattern if paste_pattern else cfg.paste_pattern)
+            .build()
+        )
+
         grid = generator.generate_grid()
     except Exception as e:
         return f"[{process_name}] ERROR generating grid for {config_file}: {e}"
@@ -45,7 +55,9 @@ def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) ->
         Alpha=cfg.simulation.alpha,
         Tenv=cfg.simulation.ambient_temp,
         WaterTemp=cfg.simulation.water_temp,
-        Conductivity=0, Density=0, SpecificHeat=0
+        Conductivity=0,
+        Density=0,
+        SpecificHeat=0,
     )
 
     try:
@@ -54,7 +66,7 @@ def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) ->
         return f"[{process_name}] ERROR running simulation {config_file}: {e}"
 
     duration = time.time() - start_time
-    
+
     final_step = simulation_history[-1]
     max_temp = np.max(final_step)
     output_filename = os.path.splitext(config_file)[0] + "_result.txt"
@@ -67,7 +79,11 @@ def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) ->
     if SAVE_TO_CSV:
         csv_filename = os.path.splitext(config_file)[0] + "_temperature_history.csv"
         with open(csv_filename, "w") as f:
-            header = "TimeStep," + ",".join(f"Node_{i+1}" for i in range(len(grid.nodes))) + "\n"
+            header = (
+                "TimeStep,"
+                + ",".join(f"Node_{i+1}" for i in range(len(grid.nodes)))
+                + "\n"
+            )
             f.write(header)
             for step_idx, temps in enumerate(simulation_history):
                 line = f"{step_idx}," + ",".join(f"{temp:.4f}" for temp in temps) + "\n"
@@ -77,15 +93,18 @@ def run_simulation_task(config_file: str, paste_pattern: PastePattern = None) ->
         plot_grid(grid, simulation_history)
 
     if PLOT_MAX:
-        times = [i * global_data.SimulationStepTime for i in range(len(simulation_history))]
+        times = [
+            i * global_data.SimulationStepTime for i in range(len(simulation_history))
+        ]
         max_temps = [np.max(step) for step in simulation_history]
         plot_max_temperature(config_file, times, max_temps)
 
     return f"[{process_name}] DONE: {os.path.basename(config_file)} -> MaxT: {max_temp:.1f}C ({duration:.1f}s)"
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     files_to_run = []
-    
+
     if len(sys.argv) > 1:
         files_to_run = sys.argv[1:]
     else:
@@ -94,7 +113,9 @@ if __name__ == '__main__':
         if os.path.isdir(sim_dir):
             files_to_run = glob.glob(os.path.join(sim_dir, "*.toml"))
         else:
-            print(f"Warning: Directory '{sim_dir}' not found. Please create it or pass files as arguments.")
+            print(
+                f"Warning: Directory '{sim_dir}' not found. Please create it or pass files as arguments."
+            )
 
     if not files_to_run:
         print("No input files found.")
@@ -113,7 +134,7 @@ if __name__ == '__main__':
         total_tasks = len(files_to_run)
         if RUN_ALL_PATTERNS:
             total_tasks *= len(PastePattern)
-        num_workers = min(num_cores, len(files_to_run))    
+        num_workers = min(num_cores, len(files_to_run))
 
         with multiprocessing.Pool(processes=num_workers) as pool:
             results = []
@@ -122,10 +143,18 @@ if __name__ == '__main__':
                 for file in files_to_run:
                     for pattern in PastePattern:
                         tasks.append((file, pattern))
-                for result in tqdm(pool.starmap(run_simulation_task, tasks), total=len(tasks), desc="Simulations Progress"):
+                for result in tqdm(
+                    pool.starmap(run_simulation_task, tasks),
+                    total=len(tasks),
+                    desc="Simulations Progress",
+                ):
                     results.append(result)
             else:
-                for result in tqdm(pool.imap_unordered(run_simulation_task, files_to_run), total=len(files_to_run), desc="Simulations Progress"):
+                for result in tqdm(
+                    pool.imap_unordered(run_simulation_task, files_to_run),
+                    total=len(files_to_run),
+                    desc="Simulations Progress",
+                ):
                     results.append(result)
     else:
         results = []
@@ -138,7 +167,7 @@ if __name__ == '__main__':
                 result = run_simulation_task(file)
                 results.append(result)
     total_time = time.time() - start_global
-    
+
     print("\n--- All Simulations Finished ---")
     print(f"Total batch time: {total_time:.2f} s")
     print("\nResults Summary:")

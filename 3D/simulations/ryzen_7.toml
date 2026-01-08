@@ -50,14 +50,14 @@ c = 700.0
 
 [materials.ihs]
 # Integrated Heat Spreader (Copper)
-k = 380.0
+k = 398.0
 rho = 8960.0
 c = 385.0
 
 [materials.paste]
 # Thermal Interface Material
 k = 80.0        # Effective value
-rho = 2500.0
+rho = 3700.0
 c = 800.0
 
 [materials.air]
